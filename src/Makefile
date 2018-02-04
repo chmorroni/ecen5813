@@ -12,7 +12,7 @@ AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -map=project1.map
 TARGET:=project1-kl25z.elf
-PLATFORM_LDFLAGS:=-T ../include/kl25z/MKL25Z128xxx4_flash.ld
+PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-I../include/cmsis -I../include/kl25z -I../include/common
 endif
 
