@@ -10,9 +10,9 @@ CC:=arm-none-eabi-gcc
 CPP:=arm-none-eabi-cpp
 AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
-PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -map=project1.map
+PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM=$(PLATFORM)
 TARGET:=project1-kl25z.elf
-PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
+PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld -map=project1.map
 INCLUDE_FLAGS:=-I../include/cmsis -I../include/kl25z -I../include/common
 endif
 
@@ -21,6 +21,7 @@ CC:=arm-linux-gnueabi-gcc
 CPP:=arm-linux-gnueabi-cpp
 AS:=arm-linux-gnueabi-as
 LD:=arm-linux-gnueabi-ld
+PLATFORM_FLAGS:=-DPLATFORM=$(PLATFORM)
 TARGET:=project1-bbb.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
@@ -30,6 +31,7 @@ CC:=gcc
 CPP:=cpp
 AS:=as
 LD:=ld
+PLATFORM_FLAGS:=-DPLATFORM=$(PLATFORM)
 TARGET:=project1-host.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
@@ -40,13 +42,16 @@ CFLAGS:=-Wall -Werror -g -O0 -std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 LDFLAGS:=-std=c99  $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS)
 CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS)
 
-# Grab SOURCES variable from sources.mk
+# Grab CSRC and SSRC variables from sources.mk
 include sources.mk
 
-DEPFILES:=$(SOURCES:.c=.d)
-PREFILES:=$(SOURCES:.c=.i)
-ASMFILES:=$(SOURCES:.c=.S)
-OBJFILES:=$(ASMFILES:.S=.o)
+# Only generate .d/.i files from C files
+DEPFILES:=$(CSRC:.c=.d)
+PREFILES:=$(CSRC:.c=.i)
+# These assembly files are the ones generated from C files and can be cleaned
+ASMFILES:=$(CSRC:.c=.S)
+# Assembly that's written on its own is in SSRC so it isn't cleaned
+OBJFILES:=$(ASMFILES:.S=.o) $(SSRC:.S=.o)
 
 .PHONY: clean redo build compile-all
 
@@ -73,7 +78,7 @@ redo: clean build
 # Also generate dependency file if the build succeeds
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-	$(CC) $(INCLUDE_FLAGS) -M $< -o $*.d
+	$(CC) $(CFLAGS) -M $< -o $*.d
 
 # Make preprocessed file from C file
 %.i: %.c
