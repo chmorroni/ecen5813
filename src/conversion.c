@@ -20,10 +20,22 @@
  * @date 01/31/2018
  */
 
+#include <stdint.h>
+#include <stddef.h> /* for NULL */
+#include "conversion.h"
+
 uint8_t my_itoa(int32_t data, uint8_t * ptr, uint32_t base)
 {
+  if (ptr == NULL || base < 2 || base > 16) {
+    return 0;
+  }
+  return 0;
 }
 
 uint32_t my_atoi(uint8_t * ptr, uint8_t digits, uint32_t base)
 {
+  if (ptr == NULL || base < 2 || base > 16) {
+    return 0;
+  }
+  return 0;
 }

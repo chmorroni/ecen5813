@@ -22,6 +22,12 @@
 #ifndef __CONVERSIONS_H__
 #define __CONVERSIONS_H__
 
+
+#define BASE_2 (2)
+#define BASE_8 (8)
+#define BASE_10 (10)
+#define BASE_16 (16)
+
 /**
  * @brief Converts integers to ASCII strings
  *

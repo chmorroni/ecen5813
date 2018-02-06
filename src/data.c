@@ -18,6 +18,10 @@
  * @date 01/31/2018
  */
 
+#include <stdint.h>
+#include <stddef.h> /* for size_t and NULL */
+#include "data.h"
+
 void print_cstd_type_sizes()
 {
 }

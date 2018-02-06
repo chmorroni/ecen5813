@@ -20,11 +20,10 @@
 
 #include "project1.h"
 
-void main()
+int main()
 {
-
 #ifdef PROJECT1
   project1();
 #endif
-
+  return 0;
 }

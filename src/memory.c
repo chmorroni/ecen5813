@@ -20,30 +20,63 @@
  * @date 01/31/2018
  */
 
+#include <stdint.h>
+#include <stddef.h> /* for size_t and NULL */
+#include "memory.h"
+
 uint8_t * my_memmove(uint8_t * src, uint8_t * dst, size_t length)
 {
+  if (src == NULL || dst == NULL) {
+    return NULL;
+  }
+  /* */
+  return dst;
 }
 
 uint8_t * my_memcpy(uint8_t * src, uint8_t * dst, size_t length)
 {
+  if (src == NULL || dst == NULL) {
+    return NULL;
+  }
+  /* */
+  return dst;
 }
 
 uint8_t * my_memset(uint8_t * src, size_t length, uint8_t value)
 {
+  if (src == NULL) {
+    return NULL;
+  }
+  /* */
+  return src;
 }
 
 uint8_t * my_memzero(uint8_t * src, size_t length)
 {
+  if (src == NULL) {
+    return NULL;
+  }
+  /* */
+  return src;
 }
 
 uint8_t * my_reverse(uint8_t * src, size_t length)
 {
+  if (src == NULL) {
+    return NULL;
+  }
+  /* */
+  return src;
 }
 
 int32_t * reserve_words(size_t length)
 {
+  /* */
+  return NULL;
 }
 
 uint8_t free_words(uint32_t * src)
 {
+  /* */
+  return 0;
 }
