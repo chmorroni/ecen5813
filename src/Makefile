@@ -49,9 +49,9 @@ include sources.mk
 DEPFILES:=$(CSRC:.c=.d)
 PREFILES:=$(CSRC:.c=.i)
 # These assembly files are the ones generated from C files and can be cleaned
-ASMFILES:=$(CSRC:.c=.S)
+ASMFILES:=$(CSRC:.c=.asm)
 # Assembly that's written on its own is in SSRC so it isn't cleaned
-OBJFILES:=$(ASMFILES:.S=.o) $(SSRC:.S=.o)
+OBJFILES:=$(ASMFILES:.asm=.o) $(SSRC:.S=.o)
 
 .PHONY: clean redo build compile-all
 
