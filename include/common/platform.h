@@ -27,10 +27,12 @@ void __no_printf();
 
 #elif defined(PLATFORM_BBB)
 /* Enable use of printf in BeagleBone target executable */
+#include <stdio.h>
 #define PRINTF printf
 
 #elif defined(PLATFORM_HOST)
 /* Enable use of printf in host target executable */
+#include <stdio.h>
 #define PRINTF printf
 
 #else
