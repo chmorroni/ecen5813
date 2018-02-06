@@ -10,9 +10,9 @@ CC:=arm-none-eabi-gcc
 CPP:=arm-none-eabi-cpp
 AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
-PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM=$(PLATFORM)
+PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
 TARGET:=project1-kl25z.elf
-PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld -map=project1.map
+PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-I../include/cmsis -I../include/kl25z -I../include/common
 endif
 
@@ -21,7 +21,7 @@ CC:=arm-linux-gnueabi-gcc
 CPP:=arm-linux-gnueabi-cpp
 AS:=arm-linux-gnueabi-as
 LD:=arm-linux-gnueabi-ld
-PLATFORM_FLAGS:=-DPLATFORM=$(PLATFORM)
+PLATFORM_FLAGS:=-DPLATFORM_BBB
 TARGET:=project1-bbb.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
@@ -31,7 +31,7 @@ CC:=gcc
 CPP:=cpp
 AS:=as
 LD:=ld
-PLATFORM_FLAGS:=-DPLATFORM=$(PLATFORM)
+PLATFORM_FLAGS:=-DPLATFORM_HOST
 TARGET:=project1-host.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
@@ -55,17 +55,17 @@ OBJFILES:=$(ASMFILES:.S=.o) $(SSRC:.S=.o)
 
 .PHONY: clean redo build compile-all
 
-compile-all: $(OBJFILES)
-
 build: compile-all
-	$(CC) $(CFLAGS) $(OBJFILES) -o $(TARGET)
+	$(CC) $(LDFLAGS) $(OBJFILES) -o $(TARGET)
+
+compile-all: $(OBJFILES)
 
 clean:
 	rm -f $(OBJFILES)
 	rm -f $(PREFILES)
 	rm -f $(ASMFILES)
 	rm -f $(DEPFILES)
-	rm -f $(TARGET)
+	rm -f project1-host.elf project1-bbb.elf project1-kl25z.elf
 
 redo: clean build
 
