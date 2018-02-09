@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <stddef.h> /* for size_t and NULL */
+#include <stdlib.h> /* for malloc and free */
 #include "memory.h"
 
 uint8_t * my_memmove(uint8_t * src, uint8_t * dst, size_t length)
@@ -29,7 +30,25 @@ uint8_t * my_memmove(uint8_t * src, uint8_t * dst, size_t length)
   if (src == NULL || dst == NULL) {
     return NULL;
   }
-  /* */
+
+  /* determine which side to start the copy */
+  if(src < dst)
+  {
+    int32_t i;
+    for(i = 0; i < length; i++)
+    {
+      *(dst + i) = *(src + i);
+    }
+  }
+  else
+  {
+    int32_t i;
+    for(i = length; i > 0; i--)
+    {
+      *(dst + i) = *(src + i);
+    }
+  }
+
   return dst;
 }
 
@@ -38,7 +57,13 @@ uint8_t * my_memcpy(uint8_t * src, uint8_t * dst, size_t length)
   if (src == NULL || dst == NULL) {
     return NULL;
   }
-  /* */
+
+  int32_t i;
+  for(i = 0; i < length; i++)
+  {
+    *(dst + i) = *(src + i);
+  }
+
   return dst;
 }
 
@@ -47,7 +72,13 @@ uint8_t * my_memset(uint8_t * src, size_t length, uint8_t value)
   if (src == NULL) {
     return NULL;
   }
-  /* */
+
+  int32_t i;
+  for(i = 0; i < length; i++)
+  {
+    *(src + i) = value;
+  }
+
   return src;
 }
 
@@ -56,7 +87,13 @@ uint8_t * my_memzero(uint8_t * src, size_t length)
   if (src == NULL) {
     return NULL;
   }
-  /* */
+
+  int32_t i;
+  for(i = 0; i < length; i++)
+  {
+    *(src + i) = 0;
+  }
+
   return src;
 }
 
@@ -65,18 +102,31 @@ uint8_t * my_reverse(uint8_t * src, size_t length)
   if (src == NULL) {
     return NULL;
   }
-  /* */
+
+  uint8_t temp;
+  int32_t i;
+  for(i = 0; i < length / 2; i++)
+  {
+    temp = *(src + i);
+    *(src + i) = *(src + length - 1 - i);
+    *(src + length - 1 - i) = temp;
+  }
+
   return src;
 }
 
 int32_t * reserve_words(size_t length)
 {
-  /* */
-  return NULL;
+  return malloc(length * 4);
 }
 
 uint8_t free_words(uint32_t * src)
 {
-  /* */
+  if(src == NULL)
+  {
+    return 1;
+  }
+
+  free(src);
   return 0;
 }
