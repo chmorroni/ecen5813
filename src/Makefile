@@ -39,24 +39,23 @@ endif
 # Override Make default GCC toolchain
 
 CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
-LDFLAGS:=-std=c99  $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS)
+LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=project1.map
 CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 
 # Grab CSRC and SSRC variables from sources.mk
 include sources.mk
 
-# Only generate .d/.i files from C files
-DEPFILES:=$(CSRC:.c=.d)
-PREFILES:=$(CSRC:.c=.i)
+# Dependency and preprocessed files can be generated from all sources
+DEPFILES:=$(CSRC:.c=.d) $(SSRC:.S=.d)
+PREFILES:=$(CSRC:.c=.i) $(SSRC:.S=.i)
 # These assembly files are the ones generated from C files and can be cleaned
+# Assembly that's handwritten is in SSRC so it isn't cleaned
 ASMFILES:=$(CSRC:.c=.asm)
-# Assembly that's written on its own is in SSRC so it isn't cleaned
-OBJFILES:=$(ASMFILES:.asm=.o) $(SSRC:.S=.o)
+OBJFILES:=$(CSRC:.c=.o) $(SSRC:.S=.o)
 
 .PHONY: clean redo build compile-all
 
-build: compile-all
-	$(CC) $(LDFLAGS) $(OBJFILES) -o $(TARGET)
+build: $(TARGET)
 
 compile-all: $(OBJFILES)
 
@@ -65,6 +64,7 @@ clean:
 	rm -f $(PREFILES)
 	rm -f $(ASMFILES)
 	rm -f $(DEPFILES)
+	rm -f project1.map
 	rm -f project1-host.elf project1-bbb.elf project1-kl25z.elf
 
 redo: clean build
@@ -83,12 +83,19 @@ redo: clean build
 # Make object file from assembly file
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -M $< -o $*.d
 
 # Make preprocessed file from C file
 %.i: %.c
+	$(CC) $(CPPFLAGS) -E $< -o $@
+
+# Make preprocessed file from assembly file
+%.i: %.S
 	$(CC) $(CPPFLAGS) -E $< -o $@
 
 # Make assembly file from C file
 %.asm: %.c
 	$(CC) $(CFLAGS) -S $< -o $@
 
+%.elf: $(OBJFILES)
+	$(CC) $(LDFLAGS) $^ -o $@
