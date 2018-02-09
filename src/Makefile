@@ -38,9 +38,9 @@ endif
 
 # Override Make default GCC toolchain
 
-CFLAGS:=-Wall -Werror -g -O0 -std=c99 -D PROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
+CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 LDFLAGS:=-std=c99  $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS)
-CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS)
+CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 
 # Grab CSRC and SSRC variables from sources.mk
 include sources.mk
@@ -79,6 +79,10 @@ redo: clean build
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	$(CC) $(CFLAGS) -M $< -o $*.d
+
+# Make object file from assembly file
+%.o: %.S
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Make preprocessed file from C file
 %.i: %.c
