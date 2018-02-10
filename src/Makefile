@@ -40,6 +40,10 @@ TARGET:=project1-host.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
 
+ifeq ($(VERBOSE),TRUE)
+PLATFORM_FLAGS+=-DDEBUG
+endif
+
 # Override Make default GCC toolchain
 
 CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
