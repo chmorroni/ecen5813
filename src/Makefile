@@ -12,7 +12,7 @@ AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
-TARGET:=project1-kl25z.elf
+TARGET:=project1-kl25z.elf project1-kl25z.srec
 PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-I../include/cmsis -I../include/kl25z -I../include/common
 endif
@@ -68,7 +68,7 @@ clean:
 	rm -f $(PREFILES)
 	rm -f $(ASMFILES)
 	rm -f $(DEPFILES)
-	rm -f project1.map
+	rm -f project1.map project1-kl25z.srec
 	rm -f project1-host.elf project1-bbb.elf project1-kl25z.elf
 
 redo: clean build
@@ -103,4 +103,8 @@ redo: clean build
 
 %.elf: $(OBJFILES)
 	$(CC) $(LDFLAGS) $^ -o $@
+	$(SIZE) $@
+
+%.srec: %.elf
+	arm-none-eabi-objcopy $< -O srec $@
 	$(SIZE) $@
