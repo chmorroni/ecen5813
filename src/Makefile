@@ -22,6 +22,7 @@ CPP:=arm-linux-gnueabi-cpp
 AS:=arm-linux-gnueabi-as
 LD:=arm-linux-gnueabi-ld
 PLATFORM_FLAGS:=-DPLATFORM_BBB
+PLATFORM_LDFLAGS:=-static
 TARGET:=project1-bbb.elf
 INCLUDE_FLAGS:=-I../include/common
 endif
