@@ -10,6 +10,7 @@ CC:=arm-none-eabi-gcc
 CPP:=arm-none-eabi-cpp
 AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
+SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
 TARGET:=project1-kl25z.elf
 PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
@@ -21,6 +22,7 @@ CC:=arm-linux-gnueabi-gcc
 CPP:=arm-linux-gnueabi-cpp
 AS:=arm-linux-gnueabi-as
 LD:=arm-linux-gnueabi-ld
+SIZE:=arm-linux-gnueabi-size
 PLATFORM_FLAGS:=-DPLATFORM_BBB
 PLATFORM_LDFLAGS:=-static
 TARGET:=project1-bbb.elf
@@ -32,6 +34,7 @@ CC:=gcc
 CPP:=cpp
 AS:=as
 LD:=ld
+SIZE:=size
 PLATFORM_FLAGS:=-DPLATFORM_HOST
 TARGET:=project1-host.elf
 INCLUDE_FLAGS:=-I../include/common
@@ -100,3 +103,4 @@ redo: clean build
 
 %.elf: $(OBJFILES)
 	$(CC) $(LDFLAGS) $^ -o $@
+	$(SIZE) $@
