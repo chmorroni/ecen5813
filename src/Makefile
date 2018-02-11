@@ -1,3 +1,32 @@
+#-----------------------------------------------------------------------------
+# Copyright (C) 2018
+# Christopher Morroni and Matthew Haney
+# University of Colorado, Boulder
+#
+# Redistribution, modification, or use of this software in source or binary
+# forms is permitted as long as the files maintain this copyright. Users are
+# permitted to modify this and use it to learn about the field of embedded
+# software. Christopher Morroni, Matthew Haney, and the University of
+# Colorado are not liable for any misuse of this material.
+#
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Usage: make [TARGET] [OVERRIDES]
+#
+# Build Targets:
+#     <FILE>.o - Builds <FILE>.o object file
+#     build - Builds and links all source files
+#     compile-all - Compiles to object files, but stops before linking
+#     clean - Removes all generated files
+#     redo - cleans then rebuilds
+#
+# Overrides:
+#     PLATFORM - Platform for build (HOST, BBB, KL25Z)
+#     VERBOSE - Include extra print statements (TRUE, assumes false)
+#
+#-----------------------------------------------------------------------------
+
 # If no platform specified: default to HOST and notify user
 ifndef PLATFORM
 PLATFORM:=HOST
