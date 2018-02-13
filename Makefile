@@ -42,8 +42,9 @@ LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
 TARGET:=project1-kl25z.elf project1-kl25z.srec
-PLATFORM_LDFLAGS:=-T ../platform/MKL25Z128xxx4_flash.ld
-INCLUDE_FLAGS:=-I../include/cmsis -I../include/kl25z -I../include/common
+PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
+INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
+MAPFILE:=project1.map
 endif
 
 ifeq ($(PLATFORM),BBB)
@@ -55,7 +56,9 @@ SIZE:=arm-linux-gnueabi-size
 PLATFORM_FLAGS:=-DPLATFORM_BBB
 PLATFORM_LDFLAGS:=-static
 TARGET:=project1-bbb.elf
-INCLUDE_FLAGS:=-I../include/common
+INCLUDE_FLAGS:=-Iinclude/common
+BBB_ADDRESS:=192.168.7.2
+MAPFILE:=project1.map
 endif
 
 ifeq ($(PLATFORM),HOST)
@@ -66,21 +69,19 @@ LD:=ld
 SIZE:=size
 PLATFORM_FLAGS:=-DPLATFORM_HOST
 TARGET:=project1-host.elf
-INCLUDE_FLAGS:=-I../include/common
+INCLUDE_FLAGS:=-Iinclude/common
+MAPFILE:=project1.map
 endif
 
 ifeq ($(VERBOSE),TRUE)
 PLATFORM_FLAGS+=-DDEBUG
 endif
 
-# Override Make default GCC toolchain
-
-CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
-LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=project1.map
-CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
-
 # Grab CSRC and SSRC variables from sources.mk
-include sources.mk
+include src/sources.mk
+# These sources come from the `src` directory
+CSRC:=$(addprefix src/,$(CSRC))
+SSRC:=$(addprefix src/,$(SSRC))
 
 # Dependency and preprocessed files can be generated from all sources
 DEPFILES:=$(CSRC:.c=.d) $(SSRC:.S=.d)
@@ -90,7 +91,16 @@ PREFILES:=$(CSRC:.c=.i) $(SSRC:.S=.i)
 ASMFILES:=$(CSRC:.c=.asm)
 OBJFILES:=$(CSRC:.c=.o) $(SSRC:.S=.o)
 
-.PHONY: clean redo build compile-all
+# Place output in the `build` directory
+TARGET:=$(addprefix build/,$(TARGET))
+MAPFILE:=$(addprefix build/,$(MAPFILE))
+
+# Compiler options
+CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
+LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=$(MAPFILE)
+CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
+
+.PHONY: clean redo build compile-all install
 
 build: $(TARGET)
 
@@ -101,10 +111,26 @@ clean:
 	rm -f $(PREFILES)
 	rm -f $(ASMFILES)
 	rm -f $(DEPFILES)
-	rm -f project1.map project1-kl25z.srec
-	rm -f project1-host.elf project1-bbb.elf project1-kl25z.elf
+	rm -f $(MAPFILE)
+	rm -f $(TARGET)
 
 redo: clean build
+
+ifeq ($(PLATFORM),BBB)
+install: $(TARGET)
+	@echo Searching for BBB at $(BBB_ADDRESS)...
+	@if ping -nq -c 2 -w 2 $(BBB_ADDRESS) >/dev/null 2>&1; then scp $(TARGET) debian@192.168.7.2:/home/debian/bin; else echo "BBB not found at $(BBB_ADDRESS).\nPass a different IP through the BBB_ADDRESS flag."; fi
+endif
+
+ifeq ($(PLATFORM),HOST)
+install: $(TARGET)
+	@echo "Installation on host platform: nothing to do."
+endif
+
+ifeq ($(PLATFORM),KL25Z)
+install: $(TARGET)
+	@echo "Installation on KL25Z not yet supported."
+endif
 
 # Include auto-generated dependency files if they are available
 # This will trigger a rebuild of object files if their sources change

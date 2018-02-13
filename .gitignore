@@ -9,6 +9,17 @@
 # Preprocessed files
 *.i
 
+# Generated assembly
+*.asm
+
+# Archives
+*.a
+
 # Output files
 *.elf
 *.map
+*.srec
+
+# All files in output directory, just in case
+build/*
+!build/.gitkeep
