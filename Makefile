@@ -59,6 +59,8 @@ TARGET:=project1-bbb.elf
 INCLUDE_FLAGS:=-Iinclude/common
 BBB_ADDRESS:=192.168.7.2
 MAPFILE:=project1.map
+INSTALL_PATH:=/home/debian/bin
+INSTALL_FLAGS=$(BBB_ADDRESS) $(TARGET) $(INSTALL_PATH) # Needs to be recursive
 endif
 
 ifeq ($(PLATFORM),HOST)
@@ -68,9 +70,11 @@ AS:=as
 LD:=ld
 SIZE:=size
 PLATFORM_FLAGS:=-DPLATFORM_HOST
-TARGET:=project1-host.elf
+TARGET:=project1.elf
 INCLUDE_FLAGS:=-Iinclude/common
 MAPFILE:=project1.map
+INSTALL_PATH:=/usr/local/bin
+INSTALL_FLAGS=-e $(TARGET) -p $(INSTALL_PATH) -f
 endif
 
 ifeq ($(VERBOSE),TRUE)
@@ -100,7 +104,10 @@ CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLA
 LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=$(MAPFILE)
 CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 
-.PHONY: clean redo build compile-all install
+# Installation options
+SH:=/bin/sh
+
+.PHONY: clean redo build compile-all install uninstall
 
 build: $(TARGET)
 
@@ -116,21 +123,11 @@ clean:
 
 redo: clean build
 
-ifeq ($(PLATFORM),BBB)
 install: $(TARGET)
-	@echo Searching for BBB at $(BBB_ADDRESS)...
-	@if ping -nq -c 2 -w 2 $(BBB_ADDRESS) >/dev/null 2>&1; then scp $(TARGET) debian@192.168.7.2:/home/debian/bin; else echo "BBB not found at $(BBB_ADDRESS).\nPass a different IP through the BBB_ADDRESS flag."; fi
-endif
+	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS)
 
-ifeq ($(PLATFORM),HOST)
-install: $(TARGET)
-	@echo "Installation on host platform: nothing to do."
-endif
-
-ifeq ($(PLATFORM),KL25Z)
-install: $(TARGET)
-	@echo "Installation on KL25Z not yet supported."
-endif
+uninstall:
+	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS) -u
 
 # Include auto-generated dependency files if they are available
 # This will trigger a rebuild of object files if their sources change
