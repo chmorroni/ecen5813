@@ -41,10 +41,10 @@ AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
-TARGET:=project1-kl25z.elf project1-kl25z.srec
+TARGET:=project2-kl25z.elf project2-kl25z.srec
 PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
-MAPFILE:=project1.map
+MAPFILE:=project2.map
 endif
 
 ifeq ($(PLATFORM),BBB)
@@ -55,10 +55,10 @@ LD:=arm-linux-gnueabi-ld
 SIZE:=arm-linux-gnueabi-size
 PLATFORM_FLAGS:=-DPLATFORM_BBB
 PLATFORM_LDFLAGS:=-static
-TARGET:=project1-bbb.elf
+TARGET:=project2-bbb.elf
 INCLUDE_FLAGS:=-Iinclude/common
 BBB_ADDRESS:=192.168.7.2
-MAPFILE:=project1.map
+MAPFILE:=project2.map
 INSTALL_PATH:=/home/debian/bin
 INSTALL_FLAGS=$(BBB_ADDRESS) $(TARGET) $(INSTALL_PATH) # Needs to be recursive
 endif
@@ -70,9 +70,9 @@ AS:=as
 LD:=ld
 SIZE:=size
 PLATFORM_FLAGS:=-DPLATFORM_HOST
-TARGET:=project1.elf
+TARGET:=project2.elf
 INCLUDE_FLAGS:=-Iinclude/common
-MAPFILE:=project1.map
+MAPFILE:=project2.map
 INSTALL_PATH:=/usr/local/bin
 INSTALL_FLAGS=-e $(TARGET) -p $(INSTALL_PATH) -f
 endif
