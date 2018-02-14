@@ -37,37 +37,3 @@ void GPIO_Configure() {
   GPIOB_PDDR |= (1 << 19);
   GPIOD_PDDR |= (1 << 1);
 }
-
-void Toggle_Red_LED() {
-  RGB_RED_TOGGLE();
-}
-
-void PORTB_Set(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOB_PSOR |= (1 << bit_num);
-}
-
-void PORTD_Set(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOD_PSOR |= (1 << bit_num);
-}
-
-void PORTB_Clear(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOB_PCOR |= (1 << bit_num);
-}
-
-void PORTD_Clear(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOD_PCOR |= (1 << bit_num);
-}
-
-void PORTB_Toggle(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOB_PTOR |= (1 << bit_num);
-}
-
-void PORTD_Toggle(uint8_t bit_num) {
-  if (bit_num > 31) return;
-  GPIOD_PTOR |= (1 << bit_num);
-}

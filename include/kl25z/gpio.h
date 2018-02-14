@@ -24,6 +24,7 @@
 #define _GPIO_H_
 
 #include <stdint.h>
+#include "MKL25Z4.h"
 
 #define RGB_RED_PIN 18 /* Red LED: PORTB pin 18 */
 #define RGB_BLUE_PIN 1 /* Blue LED: PORTD pin 1 */
@@ -41,6 +42,72 @@
 #define RGB_BLUE_TOGGLE() (PORTD_Toggle(RGB_BLUE_PIN))
 
 /**
+ * @brief Set the output value in PORTB at the given bit position
+ *
+ * Set the output value in PORTB at the given bit position
+ * 
+ * @param bit_num The bit in PORTB to set
+ */
+__attribute__((always_inline)) static inline void PORTB_Set(uint8_t bit_num) {
+  if (bit_num < 32) GPIOB_PSOR |= (1 << bit_num);
+}
+
+/**
+ * @brief Set the output value in PORTD at the given bit position
+ *
+ * Set the output value in PORTD at the given bit position
+ *
+ * @param bit_num The bit in PORTD to set
+ */
+__attribute__((always_inline)) static inline void PORTD_Set(uint8_t bit_num) {
+  if (bit_num < 32) GPIOD_PSOR |= (1 << bit_num);
+}
+
+/**
+ * @brief Clear the output value in PORTB at the given bit position
+ *
+ * Clear the output value in PORTB at the given bit position
+ *
+ * @param bit_num The bit in PORTB to clear
+ */
+__attribute__((always_inline)) static inline void PORTB_Clear(uint8_t bit_num) {
+  if (bit_num < 32) GPIOB_PCOR |= (1 << bit_num);
+}
+
+/**
+ * @brief Clear the output value in PORTD at the given bit position
+ *
+ * Clear the output value in PORTD at the given bit position
+ * 
+ * @param bit_num The bit in PORTD to clear
+ */
+__attribute__((always_inline)) static inline void PORTD_Clear(uint8_t bit_num) {
+  if (bit_num < 32) GPIOD_PCOR |= (1 << bit_num);
+}
+
+/**
+ * @brief Toggle the output value in PORTB at the given bit position
+ *
+ * Toggle the output value in PORTB at the given bit position
+ *
+ * @param bit_num The bit in PORTB to toggle
+ */
+__attribute__((always_inline)) static inline void PORTB_Toggle(uint8_t bit_num) {
+  if (bit_num < 32) GPIOB_PTOR |= (1 << bit_num);
+}
+
+/**
+ * @brief Toggle the output value in PORTD at the given bit position
+ *
+ * Toggle the output value in PORTD at the given bit position
+ *
+ * @param bit_num The bit in PORTD to toggle
+ */
+__attribute__((always_inline)) static inline void PORTD_Toggle(uint8_t bit_num) {
+  if (bit_num < 32) GPIOD_PTOR |= (1 << bit_num);
+}
+
+/**
  * @brief Configures RGB LEDs and sets their initial values
  *
  * Configures RGB LEDs and sets their initial values
@@ -52,60 +119,8 @@ void GPIO_Configure();
  *
  * Toggle the state of the red LED
  */
-void Toggle_Red_LED();
-
-/**
- * @brief Set the output value in PORTB at the given bit position
- *
- * Set the output value in PORTB at the given bit position
- * 
- * @param bit_num The bit in PORTB to set
- */
-void PORTB_Set(uint8_t bit_num);
-
-/**
- * @brief Set the output value in PORTD at the given bit position
- *
- * Set the output value in PORTD at the given bit position
- *
- * @param bit_num The bit in PORTD to set
- */
-void PORTD_Set(uint8_t bit_num);
-
-/**
- * @brief Clear the output value in PORTB at the given bit position
- *
- * Clear the output value in PORTB at the given bit position
- *
- * @param bit_num The bit in PORTB to clear
- */
-void PORTB_Clear(uint8_t bit_num);
-
-/**
- * @brief Clear the output value in PORTD at the given bit position
- *
- * Clear the output value in PORTD at the given bit position
- * 
- * @param bit_num The bit in PORTD to clear
- */
-void PORTD_Clear(uint8_t bit_num);
-
-/**
- * @brief Toggle the output value in PORTB at the given bit position
- *
- * Toggle the output value in PORTB at the given bit position
- *
- * @param bit_num The bit in PORTB to toggle
- */
-void PORTB_Toggle(uint8_t bit_num);
-
-/**
- * @brief Toggle the output value in PORTD at the given bit position
- *
- * Toggle the output value in PORTD at the given bit position
- *
- * @param bit_num The bit in PORTD to toggle
- */
-void PORTD_Toggle(uint8_t bit_num);
+__attribute__((always_inline)) static inline void Toggle_Red_LED() {
+  RGB_RED_TOGGLE();
+}
 
 #endif /* _GPIO_H_ */
