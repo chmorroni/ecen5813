@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "gpio.h"
+#include "MKL25Z4.h"
 
 void GPIO_Configure() {
   /* Enable clock gating for LED pins */
@@ -58,7 +59,7 @@ void PORTB_Clear(uint8_t bit_num) {
 
 void PORTD_Clear(uint8_t bit_num) {
   if (bit_num > 31) return;
-  GPIOD_PCOR |= (1 << bit_bum);
+  GPIOD_PCOR |= (1 << bit_num);
 }
 
 void PORTB_Toggle(uint8_t bit_num) {
