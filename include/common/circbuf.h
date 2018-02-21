@@ -34,11 +34,11 @@ typedef __cbdata_t uint8_t;
  * Circular buffer data structure
  */
 typedef struct {
-  __cbdata_t * bmp;
-  __cbdata_t * head;
-  __cbdata_t * tail;
-  size_t size;
-  size_t count;
+  __cbdata_t * bmp; /** Base memory pointer */
+  __cbdata_t * head; /** Top of circular buffer */
+  __cbdata_t * tail; /** Bottom of circular buffer */
+  size_t size; /** Max size of circular buffer */
+  size_t count; /** Current size of circular buffer */
 } CB_t;
 
 /**
@@ -48,11 +48,12 @@ typedef struct {
  * circular buffer handling functions.
  */
 typedef enum {
-  CB_SUCCESS,
-  CB_NULL_PTR,
-  CB_BAD_LEN,
-  CB_FULL,
-  CB_EMPTY
+  CB_SUCCESS, /** Function completed successfully */
+  CB_NULL_PTR, /** Null pointer passed to function */
+  CB_BAD_MALLOC, /** Failed to allocate memory */
+  CB_BAD_LEN, /** Invalid buffer length passed */
+  CB_FULL, /** Indicates buffer is full */
+  CB_EMPTY /** Indicates buffer is empty */
 } CB_e;
 
 /**
