@@ -41,10 +41,11 @@ AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
-TARGET:=project2-kl25z.elf project2-kl25z.srec
+TARGET:=project2-kl25z.srec
 PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
 MAPFILE:=project2.map
+INSTALL_FLAGS:=-n KL25Z -b $(TARGET)
 endif
 
 ifeq ($(PLATFORM),BBB)

@@ -6,6 +6,7 @@ do
     case "$1" in
 	-b) binary=$2; shift;;
 	-n) device_name=$2; shift;;
+	-u) echo "$0: bare-metal software doesn't need to be uninstalled."; exit 0;;
 	*) echo "usage: $0 [-b binary] [-n device_name]"
     esac
     shift
@@ -21,15 +22,15 @@ else
     fi
 fi
 
-echo "Looking for KL25Z device..."
+echo "Looking for device in mounting table with name matching $device_name..."
 df | grep $device_name >/dev/null 2>&1
 
 if [ "$?" -eq "0" ]; then
     device=`df | grep $device_name | awk '{print $1}'`
     device_path=`df | grep $device_name | awk '{print $6}'`
-    echo "Found KL25Z connected on $device and mounted on $device_path."
+    echo "Found $device_name on $device and mounted on $device_path."
 else
-    echo "KL25Z not found."
+    echo "$device_name not found."
     exit 2
 fi
 
