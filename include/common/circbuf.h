@@ -75,10 +75,10 @@ CB_e CB_init(CB_t ** buffer, size_t len);
  * Free memory used by circular buffer, then free memory used to store
  * circular buffer metadata.
  * 
- * @param buffer The buffer to be destroyed
+ * @param buffer A pointer to the buffer to be destroyed
  * @return A circular buffer status code
  */
-CB_e CB_destroy(CB_t * buffer);
+CB_e CB_destroy(CB_t ** buffer);
 
 /**
  * @brief Add item to circular buffer

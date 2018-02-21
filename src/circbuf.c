@@ -47,15 +47,19 @@ CB_e CB_init(CB_t ** buffer, size_t len) {
   return CB_SUCCESS;
 }
 
-CB_e CB_destroy(CB_t * buffer) {
+CB_e CB_destroy(CB_t ** buffer) {
   /* Check that input to function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
+  if (*buffer == NULL) return CB_NULL_PTR;
 
   /* Free base memory pointer */
-  free(buffer->bmp);
+  free((*buffer)->bmp);
 
   /* Free buffer */
-  free(buffer);
+  free(*buffer);
+
+  /* Reset buffer pointer */
+  buffer = NULL;
   
   return CB_SUCCESS;
 }
