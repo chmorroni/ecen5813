@@ -24,22 +24,22 @@
 /* Disable use of printf in KL25Z target executable */
 void __no_printf();
 #define PRINTF(X, ...) __no_printf()
-#define START_CRITICAL __disable_irq()
-#define END_CRITICAL __enable_irq()
+#define START_CRITICAL() __disable_irq()
+#define END_CRITICAL() __enable_irq()
 
 #elif defined(PLATFORM_BBB)
 /* Enable use of printf in BeagleBone target executable */
 #include <stdio.h>
 #define PRINTF printf
-#define START_CRITICAL
-#define END_CRITICAL
+#define START_CRITICAL()
+#define END_CRITICAL()
 
 #elif defined(PLATFORM_HOST)
 /* Enable use of printf in host target executable */
 #include <stdio.h>
 #define PRINTF printf
-#define START_CRITICAL
-#define END_CRITICAL
+#define START_CRITICAL()
+#define END_CRITICAL()
 
 #else
 #error "Please define a PLATFORM variable using the -D option."

@@ -70,6 +70,8 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   /* Check that data can actually be added */
   if (buffer->count == buffer->size) return CB_FULL;
 
+  START_CRITICAL();
+  
   /* Push data to buffer */
   /* Move head to next available space */
   if (buffer->head == buffer->bmp + buffer->size) {
@@ -83,6 +85,8 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   *(buffer->head) = data;
   /* Update current buffer size */
   buffer->count += 1;
+
+  END_CRITICAL();
   
   return CB_SUCCESS;
 }
@@ -92,6 +96,8 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   if (buffer == NULL) return CB_NULL_PTR;
   /* Check that data can actually be removed */
   if (buffer->count == 0) return CB_EMPTY;
+
+  START_CRITICAL();
   
   /* Pop data from buffer */
   /* Retrieve data from the tail of the buffer */
@@ -106,6 +112,8 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   }
   /* Update current buffer size */
   buffer->count += 1;
+
+  END_CRITICAL();
   
   return CB_SUCCESS;
 }
@@ -128,7 +136,9 @@ CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   /*   size_t offset = count + pos; */
   /*   offset = offset % size; */
   /*   data = *(buffer->bmp + offset); */
+  START_CRITICAL();
   data = *(buffer->bmp + ((buffer->count + pos) % buffer->size) );
+  END_CRITICAL();
   
   return CB_SUCCESS
 }
