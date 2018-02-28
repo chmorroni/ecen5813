@@ -24,3 +24,27 @@ __attribute__((always_inline)) uint32_t ARM32_AIRCR_get_endianness_setting()
 {
   return ( (__AIRCR & __AIRCR_ENDIANNESS_MASK) >> __AIRCR_ENDIANNESS_OFFEST );
 }
+
+__attribute__((always_inline)) uint32_t ARM32_CCR_get_stack_alignment() {
+  return 0;
+}
+
+__attribute__((always_inline)) uint32_t ARM32_CPUID_get_part_number() {
+  return 0;
+}
+
+__attribute__((always_inline)) uint32_t ARM32_CCR_enable_divide_by_zero_trap() {
+  return 0; /* should we return anything from this? */
+}
+
+__attribute__((always_inline)) uint32_t ARM32_CCR_enable_unaligned_access_trap() {
+  return 0; /* should we return anything from this? */
+}
+
+void ARM32_create_unaligned_access_trap() {
+  /* */
+}
+
+void ARM32_create_divide_by_zero_trap() {
+  /* */
+}
