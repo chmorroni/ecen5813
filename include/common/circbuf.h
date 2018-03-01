@@ -24,9 +24,10 @@
 #ifndef _CIRCBUF_H_
 #define _CIRCBUF_H_
 
+#include <stdlib.h>
 #include <stdint.h>
 
-typedef __cbdata_t uint8_t;
+typedef uint8_t __cbdata_t;
 
 /**
  * @brief Circular buffer data structure

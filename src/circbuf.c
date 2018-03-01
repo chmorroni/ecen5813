@@ -20,6 +20,7 @@
  * @date 2018-02-14
  */
 
+#include "platform.h"
 #include "circbuf.h"
 #include <stdint.h>
 
@@ -33,16 +34,16 @@ CB_e CB_init(CB_t ** buffer, size_t len) {
   if (*buffer == NULL) return CB_BAD_MALLOC;
 
   /* Allocate memory for circular buffer data */
-  buffer->bmp = (__cbdata_t*)malloc(sizeof(__cbdata_t) * len);
-  if (buffer->bmp == NULL) return CB_BAD_MALLOC;
+  (*buffer)->bmp = (__cbdata_t*)malloc(sizeof(__cbdata_t) * len);
+  if ((*buffer)->bmp == NULL) return CB_BAD_MALLOC;
 
   /* Initialize buffer size and max size */
-  buffer->count = 0;
-  buffer->size = len;
+  (*buffer)->count = 0;
+  (*buffer)->size = len;
   
   /* Initialize head and tail pointers */
-  buffer->head = buffer->bmp;
-  buffer->tail = buffer->bmp;
+  (*buffer)->head = (*buffer)->bmp;
+  (*buffer)->tail = (*buffer)->bmp;
   
   return CB_SUCCESS;
 }
@@ -128,8 +129,8 @@ __attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer) {
 
 CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   /* Check that input to the function is valid */
-  if (buffer == NULL) return CB_NULL;
-  if (data == NULL) return CB_NULL;
+  if (buffer == NULL) return CB_NULL_PTR;
+  if (data == NULL) return CB_NULL_PTR;
 
   /* This is easy to do with modular offset math */
   /* This one liner is the same as: */
@@ -137,8 +138,8 @@ CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   /*   offset = offset % size; */
   /*   data = *(buffer->bmp + offset); */
   START_CRITICAL();
-  data = *(buffer->bmp + ((buffer->count + pos) % buffer->size) );
+  *data = *(buffer->bmp + ((buffer->count + pos) % buffer->size) );
   END_CRITICAL();
   
-  return CB_SUCCESS
+  return CB_SUCCESS;
 }
