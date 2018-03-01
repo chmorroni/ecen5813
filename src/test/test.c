@@ -19,3 +19,25 @@
  */
 
 #include <cmocka.h>
+#include "memory_test.h"
+#include "data_test.h"
+#include "conversion_test.h"
+#include "circbuf_test.h"
+
+int main(void) {
+  const struct CMUnitTest circbuf_tests[] = {
+    cmocka_unit_test(circbuf_allocate_free_test),
+    cmocka_unit_test(circbuf_invalid_pointer_test),
+    cmocka_unit_test(circbuf_initialize_test),
+    cmocka_unit_test(circbuf_add_remove_test),
+    cmocka_unit_test(circbuf_buffer_full_test),
+    cmocka_unit_test(circbuf_buffer_empty_test),
+    cmocka_unit_test(circbuf_wrap_add_test),
+    cmocka_unit_test(circbuf_wrap_remove_test),
+    cmocka_unit_test(circbuf_overfill_test),
+    cmocka_unit_test(circbuf_over_empty_test)
+  };
+  int circbuf_result = cmocka_run_group_tests(circbuf_tests, NULL, NULL);
+
+  return circbuf_result | memory_result | data_result | conversion_result;
+}

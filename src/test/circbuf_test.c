@@ -17,3 +17,55 @@
  * @author Matthew Haney
  * @date 2018-03-01
  */
+
+#include "circbuf_test.h"
+
+void circbuf_allocate_free_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_invalid_pointer_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_buffer_initialize_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_add_remove_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_buffer_full_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_buffer_empty_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_wrap_add_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_wrap_remove_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_overfill_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void circbuf_over_empty_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
