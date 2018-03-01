@@ -153,6 +153,9 @@ int32_t swap_data_endianness(uint8_t * data, size_t type_length)
 
 uint32_t determine_endianness()
 {
+#ifdef __ARCH_ARM32_H__
+  return ARM32_AIRCR_get_endianness_setting() == 0 ? LITTLE_ENDIAN : BIG_ENDIAN;
+#else
   uint16_t end_test = 0xABCD;
   uint8_t * top_half = (uint8_t*) &end_test;
   if (*top_half == 0xCD) {
@@ -163,4 +166,5 @@ uint32_t determine_endianness()
     /* This should not happen */
     return -1;
   }
+#endif
 }
