@@ -101,7 +101,7 @@ TARGET:=$(addprefix build/,$(TARGET))
 MAPFILE:=$(addprefix build/,$(MAPFILE))
 
 # Compiler options
-CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT1 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
+CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT2 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=$(MAPFILE)
 CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 

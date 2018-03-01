@@ -9,7 +9,7 @@
  *
  *****************************************************************************/
 /**
- * @file project1_test.c 
+ * @file project1.c 
  * @brief This file is to be used to project 1.
  *
  * @author Alex Fosdick
