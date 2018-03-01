@@ -110,25 +110,26 @@ void circbuf_wrap_add_test(void ** state) {
   assert_non_null(buffer);
 
   __cbdata_t test_data[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+  __cbdata_t final_data[10] = {16, 17, 7, 6, 5, 4, 3, 2, 1, 0};
   uint8_t i;
   /* First: fill buffer */
   for (i = 0; i < 10; i++) {
     assert_true(CB_buffer_add_item(buffer, test_data[i]) == CB_SUCCESS);
   }
+  assert_true(CB_is_full(buffer));
   /* Then: remove 2 items */
   __cbdata_t popped_data;
   for (i = 0; i < 2; i++) {
     assert_true(CB_buffer_remove_item(buffer, &popped_data) == CB_SUCCESS);
     assert_true(popped_data == test_data[i]);
   }
+  assert_false(CB_is_full(buffer));
   /* Then: add 2 items */
   assert_true(CB_buffer_add_item(buffer, 16) == CB_SUCCESS);
   assert_true(CB_buffer_add_item(buffer, 17) == CB_SUCCESS);
-  /* Then: check that data is correct */
-  assert_true(CB_peek(buffer, -1, &popped_data) == CB_SUCCESS);
-  assert_int_equal(popped_data, 17);
-  assert_true(CB_peek(buffer, -2, &popped_data) == CB_SUCCESS);
-  assert_int_equal(popped_data, 16);
+  assert_true(CB_is_full(buffer));
+  
+  assert_memory_equal(buffer->bmp, &final_data, 10);
   
   assert_true(CB_destroy(&buffer) == CB_SUCCESS);
   assert_null(buffer);

@@ -24,6 +24,6 @@
 /**
  * @brief function to run project2 materials
  */
-void project1();
+void project2();
 
 #endif

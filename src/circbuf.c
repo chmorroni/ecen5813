@@ -77,7 +77,7 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   /* Place new data at head pointer */
   *(buffer->head) = data;
   /* Move head to next available space */
-  if (buffer->head == buffer->bmp + buffer->size) {
+  if (buffer->head == buffer->bmp + buffer->size - 1) {
     /* If we're out of space, loop around */
     buffer->head = buffer->bmp;
   } else {
@@ -104,7 +104,7 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   /* Retrieve data from the tail of the buffer */
   *data = *(buffer->tail);
   /* Move tail to previous space */
-  if (buffer->tail == buffer->bmp + buffer->size) {
+  if (buffer->tail == buffer->bmp + buffer->size - 1) {
     /* If we're out of space, loop around */
     buffer->tail = buffer->bmp;
   } else {
@@ -112,7 +112,7 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
     (buffer->tail)++;
   }
   /* Update current buffer size */
-  buffer->count += 1;
+  buffer->count -= 1;
 
   END_CRITICAL();
   
@@ -123,12 +123,20 @@ CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (data == NULL) return CB_NULL_PTR;
-
-  /* This is easy to do with modular offset math */
-  START_CRITICAL();
-  *data = *(buffer->bmp + ((size_t)(buffer->head - buffer->bmp) / sizeof(__cbdata_t) + pos) % buffer->size);
-  printf("%d", -11 % 10)
-  END_CRITICAL();
   
+  START_CRITICAL();
+  __cbdata_t * item = buffer->head;
+  /* Walk through buffer */
+  while (pos > 0) {
+    if (item == buffer->bmp + buffer->size) {
+      item = buffer->bmp;
+    } else {
+      item++;
+    }
+    pos--;
+  }
+  *data = *item;
+  END_CRITICAL();
+   
   return CB_SUCCESS;
 }
