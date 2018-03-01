@@ -17,3 +17,22 @@
  * @author Matthew Haney
  * @date 2018-03-01
  */
+
+#ifndef __DATA_TEST_H__
+#define __DATA_TEST_H__
+
+/**
+ * @brief endianness conversion functions should fail if passed NULL pointers
+ */
+void data_endianness_invalid_pointers_test(void ** state);
+
+/**
+ * @brief Test that endianness conversion works
+ *
+ * Test big-to-little gives expected result
+ * Test little-to-big gives expected result
+ * Test big-to-little followed by little-to-big preserves original
+ */
+void data_endianness_conversion_valid_test(void ** state);
+
+#endif /* __DATA_TEST_H__ */

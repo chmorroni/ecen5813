@@ -17,3 +17,15 @@
  * @author Matthew Haney
  * @date 2018-03-01
  */
+
+#include "data_test.h"
+
+void data_endianness_invalid_pointers_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}
+
+void data_endianness_conversion_valid_test(void ** state) {
+  (void) state; /* not used */
+  /* */
+}

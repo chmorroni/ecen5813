@@ -18,6 +18,10 @@
  * @date 2018-03-01
  */
 
+#include <stdint.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
 #include <cmocka.h>
 #include "memory_test.h"
 #include "data_test.h"
@@ -29,7 +33,7 @@ int main(void) {
   const struct CMUnitTest circbuf_tests[] = {
     cmocka_unit_test(circbuf_allocate_free_test),
     cmocka_unit_test(circbuf_invalid_pointer_test),
-    cmocka_unit_test(circbuf_initialize_test),
+    cmocka_unit_test(circbuf_buffer_initialize_test),
     cmocka_unit_test(circbuf_add_remove_test),
     cmocka_unit_test(circbuf_buffer_full_test),
     cmocka_unit_test(circbuf_buffer_empty_test),
@@ -54,13 +58,32 @@ int main(void) {
     cmocka_unit_test(reverse_check_even_test),
     cmocka_unit_test(reverse_check_odd_test),
     cmocka_unit_test(reverse_check_charset_test)
-  }
+  };
 
+  /* Data tests */
+  const struct CMUnitTest data_tests[] = {
+    cmocka_unit_test(data_endianness_invalid_pointers_test),
+    cmocka_unit_test(data_endianness_conversion_valid_test)
+  };
+
+  /* Conversion tests */
+  const struct CMUnitTest conversion_tests[] = {
+    cmocka_unit_test(itoa_invalid_input_test),
+    cmocka_unit_test(itoa_negative_test),
+    cmocka_unit_test(itoa_positive_test),
+    cmocka_unit_test(atoi_invalid_input_test),
+    cmocka_unit_test(atoi_negative_test),
+    cmocka_unit_test(atoi_zero_zero_test),
+    cmocka_unit_test(atoi_large_number_string_test)
+  };
+  
   /* Run tests */
   /* Not really bothering with states, so just pass NULL for start and end */
   int circbuf_result = cmocka_run_group_tests(circbuf_tests, NULL, NULL);
   int memory_result = cmocka_run_group_tests(memory_tests, NULL, NULL);
-
-  /* Pass failure to shell if any tests fail */
+  int data_result = cmocka_run_group_tests(data_tests, NULL, NULL);
+  int conversion_result = cmocka_run_group_tests(conversion_tests, NULL, NULL);
+  
+  /* Pass failures (if any) to shell */
   return circbuf_result | memory_result | data_result | conversion_result;
 }
