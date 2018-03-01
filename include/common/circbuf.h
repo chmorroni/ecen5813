@@ -110,7 +110,9 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data);
  *
  * @return A circular buffer status code
  */
-__attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer);
+__attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer) {
+  return buffer->count == buffer->size;
+}
 
 /**
  * @brief Check if circular buffer is empty
@@ -119,7 +121,9 @@ __attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer);
  *
  * @return A circular buffer status code
  */
-__attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer);
+__attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer) {
+  return buffer->count == 0;
+}
 
 /**
  * @brief Peek into the buffer without removing data

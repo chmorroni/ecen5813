@@ -60,7 +60,7 @@ CB_e CB_destroy(CB_t ** buffer) {
   free(*buffer);
 
   /* Reset buffer pointer */
-  buffer = NULL;
+  *buffer = NULL;
   
   return CB_SUCCESS;
 }
@@ -74,6 +74,8 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   START_CRITICAL();
   
   /* Push data to buffer */
+  /* Place new data at head pointer */
+  *(buffer->head) = data;
   /* Move head to next available space */
   if (buffer->head == buffer->bmp + buffer->size) {
     /* If we're out of space, loop around */
@@ -82,8 +84,6 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
     /* If we have space, just advance the head */
     (buffer->head)++;
   }
-  /* Place new data at head pointer */
-  *(buffer->head) = data;
   /* Update current buffer size */
   buffer->count += 1;
 
@@ -104,12 +104,12 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   /* Retrieve data from the tail of the buffer */
   *data = *(buffer->tail);
   /* Move tail to previous space */
-  if (buffer->tail == buffer->bmp) {
+  if (buffer->tail == buffer->bmp + buffer->size) {
     /* If we're out of space, loop around */
-    buffer->tail = buffer->bmp + buffer->size;
+    buffer->tail = buffer->bmp;
   } else {
-    /* If we have space, just recess the tail */
-    (buffer->tail)--;
+    /* If we have space, just advance the tail */
+    (buffer->tail)++;
   }
   /* Update current buffer size */
   buffer->count += 1;
@@ -119,26 +119,15 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   return CB_SUCCESS;
 }
 
-__attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer) {
-  return buffer->count == buffer->size;
-}
-
-__attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer) {
-  return buffer->count == 0;
-}
-
 CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (data == NULL) return CB_NULL_PTR;
 
   /* This is easy to do with modular offset math */
-  /* This one liner is the same as: */
-  /*   size_t offset = count + pos; */
-  /*   offset = offset % size; */
-  /*   data = *(buffer->bmp + offset); */
   START_CRITICAL();
-  *data = *(buffer->bmp + ((buffer->count + pos) % buffer->size) );
+  *data = *(buffer->bmp + ((size_t)(buffer->head - buffer->bmp) / sizeof(__cbdata_t) + pos) % buffer->size);
+  printf("%d", -11 % 10)
   END_CRITICAL();
   
   return CB_SUCCESS;
