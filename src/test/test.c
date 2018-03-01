@@ -23,6 +23,8 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+
+#include "test.h"
 #include "memory_test.h"
 #include "data_test.h"
 #include "conversion_test.h"
@@ -73,6 +75,7 @@ int main(void) {
     cmocka_unit_test(itoa_positive_test),
     cmocka_unit_test(atoi_invalid_input_test),
     cmocka_unit_test(atoi_negative_test),
+    cmocka_unit_test(atoi_positive_test),
     cmocka_unit_test(atoi_zero_zero_test),
     cmocka_unit_test(atoi_large_number_string_test)
   };

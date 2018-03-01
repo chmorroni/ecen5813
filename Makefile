@@ -127,7 +127,8 @@ include src/test/sources.mk
 TEST_SOURCE:=$(addprefix src/test/,$(TEST_SOURCE))
 TEST_OBJ:=$(TEST_SOURCE:.c=.o)
 TEST_DEPS:=$(addprefix src/,$(TEST_DEPS))
-TEST_DEPS:=$(TEST_DEPS:.c=.o)
+TEST_DEP_OBJ:=$(TEST_DEPS:.c=.o)
+TEST_DEPS:=$(TEST_SOURCE:.c=.d)
 
 #########
 # RULES #
@@ -155,9 +156,18 @@ install: $(TARGET)
 uninstall:
 	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS) -u
 
-test: $(TEST_DEPS) $(TEST_OBJ)
-	$(CC) $(TEST_CFLAGS) $(TEST_OBJ) $(TEST_DEPS) -o build/test -l cmocka
+test: $(TEST_DEP_OBJ) $(TEST_OBJ)
+	$(CC) $(TEST_CFLAGS) $(TEST_OBJ) $(TEST_DEP_OBJ) -o build/test -l cmocka
 	build/test
+
+testclean:
+	rm -f $(TEST_DEPS)
+	rm -f $(TEST_OBJ)
+	rm -f $(TEST_DEP_OBJ)
+	rm -f $(DEPFILES)
+	rm -f build/test
+
+-include $(TEST_DEPS)
 
 # Include auto-generated dependency files if they are available
 # This will trigger a rebuild of object files if their sources change

@@ -18,6 +18,12 @@
  * @date 2018-03-01
  */
 
+#include <stdint.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+
 #include "memory_test.h"
 
 void memmove_invalid_pointers_test(void ** state) {

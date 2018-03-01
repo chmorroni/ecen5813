@@ -47,6 +47,11 @@ void atoi_invalid_input_test(void ** state);
 void atoi_negative_test(void ** state);
 
 /**
+ * @brief atoi works on positive numbers
+ */
+void atoi_positive_test(void ** state);
+
+/**
  * @brief atoi gracefully returns 0 if asked to convert 0 digits
  */
 void atoi_zero_zero_test(void ** state);

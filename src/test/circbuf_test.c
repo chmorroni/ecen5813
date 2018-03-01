@@ -18,11 +18,17 @@
  * @date 2018-03-01
  */
 
+#include <stdint.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+
 #include "circbuf_test.h"
 
 void circbuf_allocate_free_test(void ** state) {
   (void) state; /* not used */
-  /* */
+  
 }
 
 void circbuf_invalid_pointer_test(void ** state) {
