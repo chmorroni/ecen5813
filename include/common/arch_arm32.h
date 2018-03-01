@@ -22,24 +22,24 @@
 
 /* Project 1 constants for determining system endianness */
 #define __SCB_ADDRESS (0xE000ED00)
-#define __AIRCR_ADDRESS_OFFEST (0x0C)
+#define __AIRCR_ADDRESS_OFFSET (0x0C)
 #define __AIRCR (*((uint32_t *)(__SCB_ADDRESS + __AIRCR_ADDRESS_OFFSET)))
 #define __AIRCR_ENDIANNESS_OFFSET (15)
 #define __AIRCR_ENDIANNESS_MASK (0x1 << 15)
 
 /* Project 2 constants for reading and writing processor configuration registers */
-#define __SCB_ADDRESS (0)
-#define __CPUID_ADDRESS_OFFSET (0) #define __CPUID (0)
-#define __CPUID_PART_NO_OFFSET (0)
-#define __CPUID_PART_NO_MASK (0)
-#define __CCR_ADDRESS_OFFSET (0)
-#define __CCR (0)
-#define __CCR_STK_ALIGNMENT_OFFSET (0)
-#define __CCR_STK_ALIGNMENT_MASK (0)
-#define __CCR_UNALIGNED_ACCESS_TRAP_OFFSET (0)
-#define __CCR_UNALIGNED_ACCESS_TRAP_MASK (0)
-#define __CCR_DIVIDE_BY_ZERO_TRAP_OFFSET (0)
-#define __CCR_DIVIDE_BY_ZERO_TRAP_MASK (0)
+#define __CPUID_ADDRESS_OFFSET (0x0)
+#define __CPUID (*((uint32_t *)(__SCB_ADDRESS + __CPUID_ADDRESS_OFFSET)))
+#define __CPUID_PART_NO_OFFSET (4)
+#define __CPUID_PART_NO_MASK (0x00fc)
+#define __CCR_ADDRESS_OFFSET (0x14)
+#define __CCR (*((uint32_t *)(__SCB_ADDRESS + __CCR_ADDRESS_OFFSET)))
+#define __CCR_STK_ALIGNMENT_OFFSET (9)
+#define __CCR_STK_ALIGNMENT_MASK (0x1 << 9)
+#define __CCR_UNALIGNED_ACCESS_TRAP_OFFSET (3)
+#define __CCR_UNALIGNED_ACCESS_TRAP_MASK (0x1 << 3)
+#define __CCR_DIVIDE_BY_ZERO_TRAP_OFFSET (4)
+#define __CCR_DIVIDE_BY_ZERO_TRAP_MASK (0x1 << 4)
 
 /**
  * @brief Get the endianness configuration of an ARM processor
@@ -75,7 +75,7 @@ __attribute__((always_inline)) uint32_t ARM32_CPUID_get_part_number();
  *
  * @return ???
  */
-__attribute__((always_inline)) uint32_t ARM32_CCR_enable_divide_by_zero_trap();
+__attribute__((always_inline)) void ARM32_CCR_enable_divide_by_zero_trap();
 
 /**
  * @brief Enables unaligned access traps
@@ -84,7 +84,7 @@ __attribute__((always_inline)) uint32_t ARM32_CCR_enable_divide_by_zero_trap();
  *
  * @return ???
  */
-__attribute__((always_inline)) uint32_t ARM32_CCR_enable_unaligned_access_trap();
+__attribute__((always_inline)) void ARM32_CCR_enable_unaligned_access_trap();
 
 /**
  * @brief Triggers an unaligned access trap by running bad code
