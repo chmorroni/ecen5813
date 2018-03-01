@@ -33,7 +33,7 @@ uint32_t count_misc = 0;
 
 void project2() {
   /* Set up UART interrupt */
-  UART_configure();
+  UART_configure(9600);
   
   /* Main execution loop */
   uint8_t c;
@@ -58,21 +58,21 @@ void project2() {
   } while (c != '\n'); /* until EOF character is received */
   /* Dump statistics */
   uint8_t conversion_buf[25];
-  UART_send((uint8_t*)"###################\n");
-  UART_send((uint8_t*)"# Data Statistics #\n");
-  UART_send((uint8_t*)"###################\n");
-  UART_send((uint8_t*)" Alphabetic: ");
+  UART_send_str((uint8_t*)"###################\n");
+  UART_send_str((uint8_t*)"# Data Statistics #\n");
+  UART_send_str((uint8_t*)"###################\n");
+  UART_send_str((uint8_t*)" Alphabetic: ");
   my_itoa(count_alpha, conversion_buf, 10);
-  UART_send(conversion_buf);
-  UART_send((uint8_t*)"\n Numeric: ");
+  UART_send_str(conversion_buf);
+  UART_send_str((uint8_t*)"\n Numeric: ");
   my_itoa(count_numeric, conversion_buf, 10);
-  UART_send(conversion_buf);
-  UART_send((uint8_t*)"\n Punctuation: ");
+  UART_send_str(conversion_buf);
+  UART_send_str((uint8_t*)"\n Punctuation: ");
   my_itoa(count_punct, conversion_buf, 10);
-  UART_send(conversion_buf);
-  UART_send((uint8_t*)"\n Miscellaneous: ");
+  UART_send_str(conversion_buf);
+  UART_send_str((uint8_t*)"\n Miscellaneous: ");
   my_itoa(count_misc, conversion_buf, 10);
-  UART_send(conversion_buf);
-  UART_send((uint8_t*)"\n");
+  UART_send_str(conversion_buf);
+  UART_send_str((uint8_t*)"\n");
 }
 

@@ -59,6 +59,17 @@ UART_e UART_configure(uint32_t baud);
 UART_e UART_send(uint8_t * data);
 
 /**
+ * @brief Sends a C-style string over UART
+ *
+ * Sends data over UART using UART_send method until hitting a null character
+ *
+ * @param data A pointer to the C string to send
+ *
+ * @return An enumeration indicating success or failure
+ */
+UART_e UART_send_str(uint8_t * data);
+
+/**
  * @brief Sends a contiguous block of data through UART
  *
  * Sends a block of data, blocking until finished

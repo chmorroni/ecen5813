@@ -119,6 +119,16 @@ UART_e UART_send(uint8_t * data)
   return UART_SUCCESS;
 }
 
+UART_e UART_send_str(uint8_t * data)
+{
+  if (data == NULL) {
+    return UART_ERROR;
+  }
+
+  while (*data != '\0') UART_send(data++);
+  return UART_SUCCESS;
+}
+
 UART_e UART_send_n(uint8_t * data, uint32_t bytes)
 {
   if(data == NULL)
