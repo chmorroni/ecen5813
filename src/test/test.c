@@ -25,6 +25,7 @@
 #include "circbuf_test.h"
 
 int main(void) {
+  /* Circular buffer tests */
   const struct CMUnitTest circbuf_tests[] = {
     cmocka_unit_test(circbuf_allocate_free_test),
     cmocka_unit_test(circbuf_invalid_pointer_test),
@@ -37,7 +38,29 @@ int main(void) {
     cmocka_unit_test(circbuf_overfill_test),
     cmocka_unit_test(circbuf_over_empty_test)
   };
-  int circbuf_result = cmocka_run_group_tests(circbuf_tests, NULL, NULL);
 
+  /* Memory tests */
+  const struct CMUnitTest memory_tests[] = {
+    cmocka_unit_test(memmove_invalid_pointers_test),
+    cmocka_unit_test(memmove_no_overlap_test),
+    cmocka_unit_test(memmove_src_overlap_dst_test),
+    cmocka_unit_test(memmove_dst_overlap_src_test),
+    cmocka_unit_test(memmove_same_src_dst_test),
+    cmocka_unit_test(memset_invalid_pointers_test),
+    cmocka_unit_test(memset_check_set_test),
+    cmocka_unit_test(memzero_invalid_pointers_test),
+    cmocka_unit_test(memzero_check_set_test),
+    cmocka_unit_test(reverse_invalid_pointers_test),
+    cmocka_unit_test(reverse_check_even_test),
+    cmocka_unit_test(reverse_check_odd_test),
+    cmocka_unit_test(reverse_check_charset_test)
+  }
+
+  /* Run tests */
+  /* Not really bothering with states, so just pass NULL for start and end */
+  int circbuf_result = cmocka_run_group_tests(circbuf_tests, NULL, NULL);
+  int memory_result = cmocka_run_group_tests(memory_tests, NULL, NULL);
+
+  /* Pass failure to shell if any tests fail */
   return circbuf_result | memory_result | data_result | conversion_result;
 }
