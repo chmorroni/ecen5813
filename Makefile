@@ -27,6 +27,10 @@
 #
 #-----------------------------------------------------------------------------
 
+############################
+# PLATFORM-DEPENDENT FLAGS #
+############################
+
 # If no platform specified: default to HOST and notify user
 ifndef PLATFORM
 PLATFORM:=HOST
@@ -82,6 +86,10 @@ ifeq ($(VERBOSE),TRUE)
 PLATFORM_FLAGS+=-DDEBUG
 endif
 
+######################
+# NORMAL BUILD FLAGS #
+######################
+
 # Grab CSRC and SSRC variables from sources.mk
 include src/sources.mk
 # These sources come from the `src` directory
@@ -108,7 +116,21 @@ CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 # Installation options
 SH:=/bin/sh
 
-.PHONY: clean redo build compile-all install uninstall
+######################
+# UNIT TESTING FLAGS #
+######################
+
+TEST_CFLAGS:=-Wall -Werror -g -O0 -std=c99 $(INCLUDE_FLAGS)
+
+# Get TEST_SOURCE from src/test/sources.mk
+include src/test/sources.mk
+TEST_SOURCE:=$(addprefix src/test/,$(TEST_SOURCE))
+
+#########
+# RULES #
+#########
+
+.PHONY: clean redo build compile-all install uninstall test
 
 build: $(TARGET)
 
@@ -129,6 +151,10 @@ install: $(TARGET)
 
 uninstall:
 	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS) -u
+
+test:
+	$(CC) $(TEST_CFLAGS) $(TEST_SOURCE) -o build/test -l cmocka
+	build/test
 
 # Include auto-generated dependency files if they are available
 # This will trigger a rebuild of object files if their sources change
