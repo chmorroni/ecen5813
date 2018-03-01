@@ -25,6 +25,8 @@
 #include "uart.h"
 #include "MKL25Z4.h"
 
+CB_t * rxbuf;
+
 UART_e UART_configure(uint32_t baud)
 {
   uint8_t oversampling_ratio = UART_DEFAULT_OVERSAMPLING_RATIO - 1;
@@ -95,8 +97,12 @@ UART_e UART_configure(uint32_t baud)
              UART0_S2_RXINV(0);   /* disable inversion of Rx data */
 
   /* enable Rx and Tx */
-  UART0_C2 |= UART0_C2_TE(1) | UART0_C2_RE(1);
+  /* Also enable Rx interrupts */
+  UART0_C2 |= UART0_C2_TE(1) | UART0_C2_RE(1) | UART0_C2_RIE(1);
 
+  /* Initialize receiving circular buffer */
+  CB_init(&rxbuf, RX_BUFFER_SIZE);
+  
   return UART_SUCCESS;
 }
 
@@ -179,5 +185,5 @@ UART_e UART_receive_n(uint8_t * data, uint32_t bytes)
 
 void UART0_IRQHandler()
 {
-  
+  CB_buffer_add_item(rxbuf, UART0_D);  
 }

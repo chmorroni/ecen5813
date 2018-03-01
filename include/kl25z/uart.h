@@ -25,10 +25,16 @@
 
 #include <stdint.h>
 
+#include "circbuf.h"
+
 #define KL25Z_PROCESSOR_FREQ_MHZ (22.29)
 #define UART_DEFAULT_OVERSAMPLING_RATIO (16)
 #define UART_CALC_BAUD_DIV(baud, oversamling_ratio) \
   (KL25Z_PROCESSOR_FREQ_MHZ * 1000000 / (baud * (oversamling_ratio + 1)))
+
+/* Circular buffer for Rx interrupts */
+#define RX_BUFFER_SIZE 20
+extern CB_t * rxbuf;
 
 typedef enum
 {

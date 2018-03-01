@@ -24,12 +24,15 @@
 #include "project2.h"
 #include "conversion.h"
 #include "uart.h"
+#include "circbuf.h"
 
 /* Data statistics */
 uint32_t count_alpha = 0;
 uint32_t count_numeric = 0;
 uint32_t count_punct = 0;
 uint32_t count_misc = 0;
+
+extern CB_t * rxbuf;
 
 void project2() {
   /* Set up UART interrupt */
@@ -40,7 +43,7 @@ void project2() {
   do {
     /* Wait for buffer to contain data */
     /* UART_receive_n is blocking - this tries again on an error */
-    while (UART_receive_n(&c, 1) == UART_ERROR);
+    while (CB_buffer_remove_item(rxbuf, &c) == CB_EMPTY);
     /* Process UART data from circular buffer */
     if ((c >= 'A' && c <= 'Z') ||
 	(c >= 'a' && c <= 'z')) { /* Alphabetic */
