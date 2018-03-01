@@ -24,14 +24,21 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include "data.h"
 #include "data_test.h"
 
 void data_endianness_invalid_pointers_test(void ** state) {
   (void) state; /* not used */
-  /* */
+
+  assert_true(swap_data_endianness(NULL, 2) == SWAP_ERROR);
 }
 
 void data_endianness_conversion_valid_test(void ** state) {
   (void) state; /* not used */
-  /* */
+
+  uint32_t data = 0xdeadbeef;
+  assert_true(swap_data_endianness((uint8_t*)&data, sizeof(data)) == SWAP_NO_ERROR);
+  assert_true(data == 0xefbeadde);
+  assert_true(swap_data_endianness((uint8_t*)&data, sizeof(data)) == SWAP_NO_ERROR);
+  assert_true(data == 0xdeadbeef);
 }
