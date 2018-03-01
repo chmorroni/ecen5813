@@ -33,9 +33,8 @@
 int main(void) {
   /* Circular buffer tests */
   const struct CMUnitTest circbuf_tests[] = {
-    cmocka_unit_test(circbuf_allocate_free_test),
-    cmocka_unit_test(circbuf_invalid_pointer_test),
-    cmocka_unit_test(circbuf_buffer_initialize_test),
+    cmocka_unit_test(circbuf_allocate_initialize_free_test),
+    cmocka_unit_test(circbuf_invalid_input_test),
     cmocka_unit_test(circbuf_add_remove_test),
     cmocka_unit_test(circbuf_buffer_full_test),
     cmocka_unit_test(circbuf_buffer_empty_test),

@@ -24,17 +24,12 @@
 /**
  * @brief Checks that a dynamic buffer can be created on the heap
  */
-void circbuf_allocate_free_test(void ** state);
+void circbuf_allocate_initialize_free_test(void ** state);
 
 /**
- * @brief Checks that buffer pointer is valid
+ * @brief CB_init should die with bad input
  */
-void circbuf_invalid_pointer_test(void ** state);
-
-/**
- * @brief Check that buffer is initialized
- */
-void circbuf_buffer_initialize_test(void ** state);
+void circbuf_invalid_input_test(void ** state);
 
 /**
  * @brief Check that add and then a remove returns the same item for full length of buffer
