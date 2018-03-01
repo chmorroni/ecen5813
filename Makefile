@@ -125,6 +125,9 @@ TEST_CFLAGS:=-Wall -Werror -g -O0 -std=c99 $(INCLUDE_FLAGS)
 # Get TEST_SOURCE from src/test/sources.mk
 include src/test/sources.mk
 TEST_SOURCE:=$(addprefix src/test/,$(TEST_SOURCE))
+TEST_OBJ:=$(TEST_SOURCE:.c=.o)
+TEST_DEPS:=$(addprefix src/,$(TEST_DEPS))
+TEST_DEPS:=$(TEST_DEPS:.c=.o)
 
 #########
 # RULES #
@@ -152,8 +155,8 @@ install: $(TARGET)
 uninstall:
 	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS) -u
 
-test:
-	$(CC) $(TEST_CFLAGS) $(TEST_SOURCE) -o build/test -l cmocka
+test: $(TEST_DEPS) $(TEST_OBJ)
+	$(CC) $(TEST_CFLAGS) $(TEST_OBJ) $(TEST_DEPS) -o build/test -l cmocka
 	build/test
 
 # Include auto-generated dependency files if they are available
