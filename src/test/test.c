@@ -24,6 +24,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include <stdio.h>
+
 #include "test.h"
 #include "memory_test.h"
 #include "data_test.h"
@@ -85,7 +87,10 @@ int main(void) {
   int memory_result = cmocka_run_group_tests(memory_tests, NULL, NULL);
   int data_result = cmocka_run_group_tests(data_tests, NULL, NULL);
   int conversion_result = cmocka_run_group_tests(conversion_tests, NULL, NULL);
+
+  int total_failures = circbuf_result + memory_result + data_result + conversion_result;
   
   /* Pass failures (if any) to shell */
-  return circbuf_result | memory_result | data_result | conversion_result;
+  printf("\nTotal failed tests: %d\n", total_failures);
+  return total_failures;
 }
