@@ -46,4 +46,18 @@ void __no_printf();
 
 #endif /* PLATFORM variable checks */
 
+#ifdef PLATFORM_KL25Z
+__attribute__((always_inline)) inline void __disable_irq() {
+  __asm__(
+	  "CPSID I"
+	  );
+}
+
+__attribute__((always_inline)) inline void __enable_irq() {
+  __asm__(
+	  "CPSIE I"
+	  );
+}
+#endif /* PLATFORM_KL25Z IRQ functions */
+
 #endif /* __PLATFORM_H__ */
