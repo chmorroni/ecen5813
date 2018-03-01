@@ -155,7 +155,16 @@ void circbuf_overfill_test(void ** state) {
   assert_true(CB_init(&buffer, 10) == CB_SUCCESS);
   assert_non_null(buffer);
 
-  fail();
+  __cbdata_t test_data[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+  uint8_t i;
+  /* First: fill buffer */
+  for (i = 0; i < 10; i++) {
+    assert_true(CB_buffer_add_item(buffer, test_data[i]) == CB_SUCCESS);
+  }
+  assert_true(CB_is_full(buffer));
+  
+  __cbdata_t data = 42;
+  assert_true(CB_buffer_add_item(buffer, data) == CB_FULL);
   
   assert_true(CB_destroy(&buffer) == CB_SUCCESS);
   assert_null(buffer);
@@ -168,7 +177,9 @@ void circbuf_over_empty_test(void ** state) {
   assert_true(CB_init(&buffer, 10) == CB_SUCCESS);
   assert_non_null(buffer);
 
-  fail();
+  assert_true(CB_is_empty(buffer));
+  __cbdata_t popped_data;
+  assert_true(CB_buffer_remove_item(buffer, &popped_data) == CB_EMPTY);
   
   assert_true(CB_destroy(&buffer) == CB_SUCCESS);
   assert_null(buffer);
