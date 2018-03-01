@@ -103,7 +103,7 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   /* Pop data from buffer */
   /* Retrieve data from the tail of the buffer */
   *data = *(buffer->tail);
-  /* Move tail to previous space */
+  /* Move tail to next space */
   if (buffer->tail == buffer->bmp + buffer->size - 1) {
     /* If we're out of space, loop around */
     buffer->tail = buffer->bmp;

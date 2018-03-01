@@ -142,8 +142,28 @@ void circbuf_wrap_remove_test(void ** state) {
   assert_true(CB_init(&buffer, 10) == CB_SUCCESS);
   assert_non_null(buffer);
 
-  fail();
+  /* First: save time by artificially populating buffer */
+  __cbdata_t test_data[10] = {2, 3, 4, 0, 0, 0, 0, 0, 0, 1};
+  /*                          ^     ^                    ^   */
+  /*                         bmp   head                 tail */
+  uint8_t i;
+  for (i = 0; i < 10; i++) {
+    *(buffer->bmp + i) = test_data[i];
+  }
+  buffer->head = buffer->bmp + 2;
+  buffer->tail = buffer->bmp + 9;
+  buffer->count = 4;
   
+  /* Then: remove 3 items */
+  __cbdata_t popped_data;
+  
+  assert_true(CB_buffer_remove_item(buffer, &popped_data) == CB_SUCCESS);
+  assert_true(popped_data == 1);
+  assert_true(CB_buffer_remove_item(buffer, &popped_data) == CB_SUCCESS);
+  assert_true(popped_data == 2);
+  assert_true(CB_buffer_remove_item(buffer, &popped_data) == CB_SUCCESS);
+  assert_true(popped_data == 3);
+    
   assert_true(CB_destroy(&buffer) == CB_SUCCESS);
   assert_null(buffer);
 }
