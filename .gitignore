@@ -23,3 +23,8 @@
 # All files in output directory, just in case
 build/*
 !build/.gitkeep
+
+# KDS project files
+.cproject
+.project
+.settings/*
