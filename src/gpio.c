@@ -32,6 +32,10 @@ void GPIO_Configure() {
   PORTB_PCR18 |= PORT_PCR_MUX(1);
   PORTB_PCR19 |= PORT_PCR_MUX(1);
   PORTD_PCR1 |= PORT_PCR_MUX(1);
+  /* Initialize LEDs to off */
+  RGB_RED_OFF();
+  RGB_GREEN_OFF();
+  RGB_BLUE_OFF();
   /* Configure LED pins to be outputs */
   GPIOB_PDDR |= (1 << 18);
   GPIOB_PDDR |= (1 << 19);
