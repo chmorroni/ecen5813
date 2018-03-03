@@ -44,12 +44,13 @@ CPP:=arm-none-eabi-cpp
 AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
-PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -mfpu=fpv4-sp-d16 --specs=nosys.specs -DPLATFORM_KL25Z
+PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -specs=nosys.specs -DPLATFORM_KL25Z
 TARGET:=project2-kl25z.srec
+SECONDARY_TARGET:=$(TARGET:.srec=.elf)
 PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
 MAPFILE:=project2.map
-INSTALL_FLAGS:=-n KL25Z -b $(TARGET)
+INSTALL_FLAGS=-n KL25Z -b $(TARGET)
 endif
 
 ifeq ($(PLATFORM),BBB)
@@ -106,6 +107,7 @@ OBJFILES:=$(CSRC:.c=.o) $(SSRC:.S=.o)
 
 # Place output in the `build` directory
 TARGET:=$(addprefix build/,$(TARGET))
+SECONDARY_TARGET:=$(addprefix build/,$(SECONDARY_TARGET))
 MAPFILE:=$(addprefix build/,$(MAPFILE))
 
 # Compiler options
@@ -136,6 +138,8 @@ TEST_DEPS:=$(TEST_SOURCE:.c=.d)
 
 .PHONY: clean redo build compile-all install uninstall test
 
+.SECONDARY: $(SECONDARY_TARGET)
+
 build: $(TARGET)
 
 compile-all: $(OBJFILES)
@@ -146,6 +150,7 @@ clean:
 	rm -f $(ASMFILES)
 	rm -f $(DEPFILES)
 	rm -f $(MAPFILE)
+	rm -f $(SECONDARY_TARGET)
 	rm -f $(TARGET)
 
 redo: clean build
