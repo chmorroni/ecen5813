@@ -24,7 +24,6 @@
 #define __UART_H_
 
 #include <stdint.h>
-
 #include "circbuf.h"
 
 #define KL25Z_PROCESSOR_FREQ_MHZ (22.29)
@@ -32,26 +31,35 @@
 #define UART_CALC_BAUD_DIV(baud, oversamling_ratio) \
   (KL25Z_PROCESSOR_FREQ_MHZ * 1000000 / (baud * (oversamling_ratio + 1)))
 
-/* Circular buffer for Rx interrupts */
-#define RX_BUFFER_SIZE 20
-extern CB_t * rxbuf;
+#define UART_TX_BUFFER_SIZE (256)
+#define UART_RX_BUFFER_SIZE (16)
 
 typedef enum
 {
-  UART_SUCCESS,
-  UART_ERROR
+  UART_SUCCESS, /* indicates successful operation */
+  UART_NULL_PTR, /* a null pointer was passed to the function */
+  UART_BUFFER_FULL, /* a function was unable to add to the Rx or Tx buffer */
+  UART_ERROR /* indicates some other error */
 } UART_e;
 
 /**
  * @brief Configures UART to given settings
  *
- * 
+ * Initializes UART peripheral and the Tx and Rx buffers
  *
  * @param baud The desired BAUD rate
+ * @param rx_buf A pointer to store the location of the Rx buffer
  *
  * @return An enumeration indicating success or failure
  */
-UART_e UART_configure(uint32_t baud);
+UART_e UART_configure(uint32_t baud, CB_t ** rx_buf);
+
+/**
+ * @brief Frees UART buffers
+ *
+ * @return An enumeration indicating success or failure
+ */
+UART_e UART_free_buffers();
 
 /**
  * @brief Sends a single byte through UART
@@ -88,6 +96,19 @@ UART_e UART_send_str(uint8_t * data);
 UART_e UART_send_n(uint8_t * data, uint32_t bytes);
 
 /**
+ * @brief Sends a contiguous block of data without blocking
+ *
+ * Sends a block of data by adding it to a buffer
+ * and enabling Tx interrupts to actually send the data
+ *
+ * @param data A pointer to the first byte in the block
+ * @param bytes The number of bytes to send
+ *
+ * @return An enumeration indicating success or failure
+ */
+UART_e UART_send_async(uint8_t * data, uint32_t bytes);
+
+/**
  * @brief Receives a single byte of data from UART
  *
  * Receives a byte, blocking until the byte is received
@@ -113,7 +134,8 @@ UART_e UART_receive_n(uint8_t * data, uint32_t bytes);
 /**
  * @brief The interrupt handler for UART
  *
- * Handles TX and RX interrupts
+ * For Rx interrupts, adds the received byte to the Rx buffer
+ * For Tx interrupts, sends the next byte in the Tx buffer
  *
  * @return none
  */

@@ -24,11 +24,29 @@
 #include <stddef.h> /* for size_t and NULL */
 #include "uart.h"
 #include "MKL25Z4.h"
+#include "circbuf.h"
 
-CB_t * rxbuf;
+static CB_t * ptr_uart_tx_circ_buf;
+static CB_t * ptr_uart_rx_circ_buf;
 
-UART_e UART_configure(uint32_t baud)
+UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
 {
+  /* initialize Tx buffer */
+  if( CB_init(&ptr_uart_tx_circ_buf, UART_TX_BUFFER_SIZE) != CB_SUCCESS ||
+      ptr_uart_tx_circ_buf == NULL)
+  {
+    return UART_ERROR;
+  }
+
+  /* initialize Rx buffer */
+  if( CB_init(&ptr_uart_rx_circ_buf, UART_RX_BUFFER_SIZE) != CB_SUCCESS ||
+      ptr_uart_rx_circ_buf == NULL)
+  {
+    return UART_ERROR;
+  }
+
+  *rx_buf = ptr_uart_rx_circ_buf;
+
   uint8_t oversampling_ratio = UART_DEFAULT_OVERSAMPLING_RATIO - 1;
   uint16_t baud_div = UART_CALC_BAUD_DIV(baud, oversampling_ratio);
 
@@ -72,7 +90,7 @@ UART_e UART_configure(uint32_t baud)
 
   UART0_C2 = UART0_C2_TIE(0)    | /* disable transmit interrupts */
              UART0_C2_TCIE(0)   | /* disable transmission complete interrupts */
-             UART0_C2_RIE(0)    | /* disable receiver interrupts */
+             UART0_C2_RIE(1)    | /* enable receiver interrupts */
              UART0_C2_ILIE(0)   | /* disable idle line interrupts */
              UART0_C2_TE(0)     | /* keep Tx disabled for now */
              UART0_C2_RE(0)     | /* keep Rx disabled for now */
@@ -97,12 +115,20 @@ UART_e UART_configure(uint32_t baud)
              UART0_S2_RXINV(0);   /* disable inversion of Rx data */
 
   /* enable Rx and Tx */
-  /* Also enable Rx interrupts */
   UART0_C2 |= UART0_C2_TE(1) | UART0_C2_RE(1) | UART0_C2_RIE(1);
 
-  /* Initialize receiving circular buffer */
-  CB_init(&rxbuf, RX_BUFFER_SIZE);
-  
+  /* enable interrupts */
+  NVIC_EnableIRQ(UART0_IRQn);
+  __enable_irq();
+
+  return UART_SUCCESS;
+}
+
+UART_e UART_free_buffers()
+{
+  CB_destroy(&ptr_uart_tx_circ_buf);
+  CB_destroy(&ptr_uart_rx_circ_buf);
+
   return UART_SUCCESS;
 }
 
@@ -110,7 +136,7 @@ UART_e UART_send(uint8_t * data)
 {
   if(data == NULL)
   {
-    return UART_ERROR;
+    return UART_NULL_PTR;
   }
 
   /* wait for room in Tx buffer */
@@ -128,7 +154,7 @@ UART_e UART_send(uint8_t * data)
 UART_e UART_send_str(uint8_t * data)
 {
   if (data == NULL) {
-    return UART_ERROR;
+    return UART_NULL_PTR;
   }
 
   while (*data != '\0') UART_send(data++);
@@ -139,7 +165,7 @@ UART_e UART_send_n(uint8_t * data, uint32_t bytes)
 {
   if(data == NULL)
   {
-    return UART_ERROR;
+    return UART_NULL_PTR;
   }
 
   uint32_t i;
@@ -151,11 +177,44 @@ UART_e UART_send_n(uint8_t * data, uint32_t bytes)
   return UART_SUCCESS;
 }
 
+UART_e UART_send_async(uint8_t * data, uint32_t bytes)
+{
+  if(data == NULL)
+  {
+    return UART_NULL_PTR;
+  }
+
+  uint32_t i;
+  for(i = 0; i < bytes; i++)
+  {
+    /* add data to buffer */
+    CB_e ret = CB_buffer_add_item(ptr_uart_tx_circ_buf, (__cbdata_t)*(data + i));
+    if(ret == CB_FULL)
+    {
+      /* enable Tx interrupts if any data was added to the buffer */
+      if(i != 0)
+      {
+        UART0_C2 |= UART0_C2_TIE(1);
+      }
+      return UART_BUFFER_FULL;
+    }
+    else if(ret != CB_SUCCESS)
+    {
+      return UART_ERROR;
+    }
+  }
+
+  /* enable Tx interrupts */
+  UART0_C2 |= UART0_C2_TIE(1);
+
+  return UART_SUCCESS;
+}
+
 UART_e UART_receive(uint8_t * data)
 {
   if(data == NULL)
   {
-    return UART_ERROR;
+    return UART_NULL_PTR;
   }
 
   /* wait for received data */
@@ -171,7 +230,7 @@ UART_e UART_receive_n(uint8_t * data, uint32_t bytes)
 {
   if(data == NULL)
   {
-    return UART_ERROR;
+    return UART_NULL_PTR;
   }
 
   uint32_t i;
@@ -185,5 +244,36 @@ UART_e UART_receive_n(uint8_t * data, uint32_t bytes)
 
 void UART0_IRQHandler()
 {
-  CB_buffer_add_item(rxbuf, UART0_D);  
+  if(UART0_S1 & UART0_S1_RDRF_MASK)
+  {
+    /* fetch data, this clears the interrupt */
+    uint8_t data = UART0_D;
+    if( CB_buffer_add_item(ptr_uart_rx_circ_buf, (__cbdata_t)data) != CB_SUCCESS )
+    {
+      /* maybe log something, but there's not a whole lot else we can do */
+    }
+  }
+  if(UART0_C2 & UART0_C2_TIE_MASK &&
+     UART0_S1 & UART0_S1_TDRE_MASK)
+  {
+    uint8_t data;
+    CB_e ret = CB_buffer_remove_item(ptr_uart_tx_circ_buf, (__cbdata_t *)&data);
+
+    if(ret == CB_SUCCESS)
+    {
+      /* send data, this clears the interrupt */
+      UART0_D = data;
+    }
+    else if(ret == CB_EMPTY)
+    {
+      /* disable Tx interrupts when Tx buffer is empty */
+      UART0_C2 &= ~UART0_C2_TIE(~0);
+    }
+    else
+    {
+      /* some other error, disable Tx interrupts */
+      UART0_C2 &= ~UART0_C2_TIE(~0);
+      /* maybe log something in the future */
+    }
+  }
 }

@@ -23,59 +23,113 @@
 #include "platform.h"
 #include "project2.h"
 #include "conversion.h"
+#include "gpio.h"
 #include "uart.h"
 #include "circbuf.h"
 
-/* Data statistics */
-uint32_t count_alpha = 0;
-uint32_t count_numeric = 0;
-uint32_t count_punct = 0;
-uint32_t count_misc = 0;
+void Default_IRQ()
+{
+  GPIO_Configure();
+  RGB_RED_ON();
+  while(1);
+}
 
-extern CB_t * rxbuf;
+void dump_statistics(uint32_t * count_alpha,
+                     uint32_t * count_numeric,
+                     uint32_t * count_punctuation,
+                     uint32_t * count_white_space,
+                     uint32_t * count_misc)
+{
+  uint8_t conversion_buf[25], len;
 
-void project2() {
-  /* Set up UART interrupt */
-  UART_configure(9600);
-  
-  /* Main execution loop */
-  uint8_t c;
-  do {
-    /* Wait for buffer to contain data */
-    /* UART_receive_n is blocking - this tries again on an error */
-    while (CB_buffer_remove_item(rxbuf, &c) == CB_EMPTY);
-    /* Process UART data from circular buffer */
-    if ((c >= 'A' && c <= 'Z') ||
-	(c >= 'a' && c <= 'z')) { /* Alphabetic */
-      count_alpha++;
-    } else if (c >= '0' && c <= '9') { /* Numeric */
-      count_numeric++;
-    } else if ((c >= '!' && c <= '/') ||
-	       (c >= ':' && c <= '@') ||
-	       (c >= '[' && c <= '`') ||
-	       (c >= '{' && c <= '~')) { /* Punctuation */
-      count_punct++;
-    } else { /* Miscellaneous */
-      count_misc++;
+  UART_send_async((uint8_t*)"###################\n\r", 21);
+  UART_send_async((uint8_t*)"# Data Statistics #\n\r", 21);
+  UART_send_async((uint8_t*)"###################\n\r", 21);
+
+  UART_send_async((uint8_t*)" Alphabetic: ", 13);
+  len = my_itoa(*count_alpha, conversion_buf, BASE_10);
+  UART_send_async(conversion_buf, len);
+
+  UART_send_async((uint8_t*)"\n\r Numeric: ", 12);
+  len = my_itoa(*count_numeric, conversion_buf, BASE_10);
+  UART_send_async(conversion_buf, len);
+
+  UART_send_async((uint8_t*)"\n\r Punctuation: ", 16);
+  len = my_itoa(*count_punctuation, conversion_buf, BASE_10);
+  UART_send_async(conversion_buf, len);
+
+  UART_send_async((uint8_t*)"\n\r White Space: ", 16);
+  len = my_itoa(*count_white_space, conversion_buf, BASE_10);
+  UART_send_async(conversion_buf, len);
+
+  UART_send_async((uint8_t*)"\n\r Miscellaneous: ", 18);
+  len = my_itoa(*count_misc, conversion_buf, BASE_10);
+  UART_send_async(conversion_buf, len);
+  UART_send_async((uint8_t*)"\n\r", 2);
+
+  /* clear counts */
+  *count_alpha = 0;
+  *count_numeric = 0;
+  *count_punctuation = 0;
+  *count_white_space = 0;
+  *count_misc = 0;
+}
+
+void project2()
+{
+  /* set up uart */
+  CB_t * ptr_rx_buf;
+  UART_configure(115200, &ptr_rx_buf);
+
+  uint32_t count_alpha = 0;
+  uint32_t count_numeric = 0;
+  uint32_t count_punctuation = 0;
+  uint32_t count_white_space = 0;
+  uint32_t count_misc = 0;
+
+  while(1)
+  {
+    /* process any data in the Rx buffer */
+    __cbdata_t data;
+    if( CB_buffer_remove_item(ptr_rx_buf, &data) == CB_SUCCESS )
+    {
+      uint8_t rx_char = (uint8_t)data;
+
+      /* interpret data */
+      if( (rx_char >= 'A' && rx_char <= 'Z') ||
+          (rx_char >= 'a' && rx_char <= 'z') )
+      {
+        count_alpha++;
+      }
+      else if(rx_char >= '0' && rx_char <= '9')
+      {
+        count_numeric++;
+      }
+      else if( (rx_char >= '!' && rx_char <= '/') ||
+               (rx_char >= ':' && rx_char <= '@') ||
+               (rx_char >= '[' && rx_char <= '`') ||
+               (rx_char >= '{' && rx_char <= '~') )
+      {
+        count_punctuation++;
+      }
+      else if( rx_char == ' ' ||
+               rx_char == '\n' ||
+               rx_char == '\r' ||
+               rx_char == '\t')
+      {
+        count_white_space++;
+      }
+      else
+      {
+        count_misc++;
+      }
+
+      /* print data on EOF */
+      if(rx_char == 0x04)
+      {
+        dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
+      }
     }
-  } while (c != '\n'); /* until EOF character is received */
-  /* Dump statistics */
-  uint8_t conversion_buf[25];
-  UART_send_str((uint8_t*)"###################\n");
-  UART_send_str((uint8_t*)"# Data Statistics #\n");
-  UART_send_str((uint8_t*)"###################\n");
-  UART_send_str((uint8_t*)" Alphabetic: ");
-  my_itoa(count_alpha, conversion_buf, 10);
-  UART_send_str(conversion_buf);
-  UART_send_str((uint8_t*)"\n Numeric: ");
-  my_itoa(count_numeric, conversion_buf, 10);
-  UART_send_str(conversion_buf);
-  UART_send_str((uint8_t*)"\n Punctuation: ");
-  my_itoa(count_punct, conversion_buf, 10);
-  UART_send_str(conversion_buf);
-  UART_send_str((uint8_t*)"\n Miscellaneous: ");
-  my_itoa(count_misc, conversion_buf, 10);
-  UART_send_str(conversion_buf);
-  UART_send_str((uint8_t*)"\n");
+  }
 }
 
