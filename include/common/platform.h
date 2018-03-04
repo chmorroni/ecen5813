@@ -21,6 +21,7 @@
 #define __PLATFORM_H__
 
 #if defined(PLATFORM_KL25Z)
+#include "MKL25Z4.h"
 /* Disable use of printf in KL25Z target executable */
 void __no_printf();
 #define PRINTF(X, ...) __no_printf()
@@ -45,19 +46,5 @@ void __no_printf();
 #error "Please define a PLATFORM variable using the -D option."
 
 #endif /* PLATFORM variable checks */
-
-#ifdef PLATFORM_KL25Z
-__attribute__((always_inline)) inline void __disable_irq() {
-  __asm__(
-	  "CPSID I"
-	  );
-}
-
-__attribute__((always_inline)) inline void __enable_irq() {
-  __asm__(
-	  "CPSIE I"
-	  );
-}
-#endif /* PLATFORM_KL25Z IRQ functions */
 
 #endif /* __PLATFORM_H__ */
