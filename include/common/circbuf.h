@@ -27,7 +27,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef uint8_t __cbdata_t;
+typedef struct {
+  uint8_t * str;
+  uint32_t length;
+  uint32_t crc;
+} __cbdata_t;
 
 /**
  * @brief Circular buffer data structure

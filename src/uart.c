@@ -258,13 +258,20 @@ void UART0_IRQHandler()
   if(UART0_C2 & UART0_C2_TIE_MASK &&
      UART0_S1 & UART0_S1_TDRE_MASK) /* Tx interrupt */
   {
-    uint8_t data;
+    __cbdata_t data;
     CB_e ret = CB_buffer_remove_item(ptr_uart_tx_circ_buf, (__cbdata_t *)&data);
 
     if(ret == CB_SUCCESS)
     {
       /* send data, this clears the interrupt */
-      UART0_D = data;
+      /* UART0_D = data; */
+      uint8_t conversion_buf[25];
+      uint8_t converted_length = 0;
+      UART_send_n(data.str, data.len);
+      conversion_length = my_itoa(data.len, conversion_buf, 10);
+      UART_send_n(conversion_buf, converted_length);
+      conversion_length = my_itoa(data.crc, conversion_buf, 10);
+      UART_send_n(conversion_buf, converted_length);
     }
     else if(ret == CB_EMPTY)
     {
