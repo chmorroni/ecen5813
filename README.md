@@ -10,11 +10,15 @@ make [TARGET] [OVERRIDES]
 
 Build Targets:
 
-* \<FILE>.o - Builds \<FILE>.o object file
+* \<FILE> - Builds \<FILE> object file
 * build - Builds and links all source files
 * compile-all - Compiles to object files, but stops before linking
 * clean - Removes all generated files
-* redo - cleans then rebuilds
+* redo - Cleans then rebuilds
+* install - Builds then installs on target
+* uninstall - Uninstalls from target
+* test - Builds and runs cmocka unit tests
+* testclean - Cleans files generated for unit tests
 
 Overrides:
 
