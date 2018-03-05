@@ -20,10 +20,13 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 
+#define UNUSED(x) if(x)
+
 #if defined(PLATFORM_KL25Z)
 #include "MKL25Z4.h"
 /* Disable use of printf in KL25Z target executable */
 void __no_printf();
+#define SEND_STR UART_send_async
 #define PRINTF(X, ...) __no_printf()
 #define START_CRITICAL() __disable_irq()
 #define END_CRITICAL() __enable_irq()
@@ -31,6 +34,7 @@ void __no_printf();
 #elif defined(PLATFORM_BBB)
 /* Enable use of printf in BeagleBone target executable */
 #include <stdio.h>
+#define SEND_STR(str, len) printf("%s", str)
 #define PRINTF printf
 #define START_CRITICAL()
 #define END_CRITICAL()
@@ -38,6 +42,7 @@ void __no_printf();
 #elif defined(PLATFORM_HOST)
 /* Enable use of printf in host target executable */
 #include <stdio.h>
+#define SEND_STR(str, len) printf("%s", str)
 #define PRINTF printf
 #define START_CRITICAL()
 #define END_CRITICAL()

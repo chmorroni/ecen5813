@@ -23,16 +23,12 @@
 #include "platform.h"
 #include "project2.h"
 #include "conversion.h"
-#include "gpio.h"
-#include "uart.h"
 #include "circbuf.h"
 
-void Default_IRQ()
-{
-  GPIO_Configure();
-  RGB_RED_ON();
-  while(1);
-}
+#ifdef PLATFORM_KL25Z
+#include "gpio.h"
+#include "uart.h"
+#endif
 
 void dump_statistics(uint32_t * count_alpha,
                      uint32_t * count_numeric,
@@ -42,30 +38,34 @@ void dump_statistics(uint32_t * count_alpha,
 {
   uint8_t conversion_buf[25], len;
 
-  UART_send_async((uint8_t*)"###################\n\r", 21);
-  UART_send_async((uint8_t*)"# Data Statistics #\n\r", 21);
-  UART_send_async((uint8_t*)"###################\n\r", 21);
+#ifndef PLATFORM_KL25Z
+  UNUSED(len);
+#endif
 
-  UART_send_async((uint8_t*)" Alphabetic: ", 13);
+  SEND_STR((uint8_t*)"\n\r###################\n\r", 23);
+  SEND_STR((uint8_t*)"# Data Statistics #\n\r", 21);
+  SEND_STR((uint8_t*)"###################\n\r", 21);
+
+  SEND_STR((uint8_t*)" Alphabetic: ", 13);
   len = my_itoa(*count_alpha, conversion_buf, BASE_10);
-  UART_send_async(conversion_buf, len);
+  SEND_STR(conversion_buf, len);
 
-  UART_send_async((uint8_t*)"\n\r Numeric: ", 12);
+  SEND_STR((uint8_t*)"\n\r Numeric: ", 12);
   len = my_itoa(*count_numeric, conversion_buf, BASE_10);
-  UART_send_async(conversion_buf, len);
+  SEND_STR(conversion_buf, len);
 
-  UART_send_async((uint8_t*)"\n\r Punctuation: ", 16);
+  SEND_STR((uint8_t*)"\n\r Punctuation: ", 16);
   len = my_itoa(*count_punctuation, conversion_buf, BASE_10);
-  UART_send_async(conversion_buf, len);
+  SEND_STR(conversion_buf, len);
 
-  UART_send_async((uint8_t*)"\n\r White Space: ", 16);
+  SEND_STR((uint8_t*)"\n\r White Space: ", 16);
   len = my_itoa(*count_white_space, conversion_buf, BASE_10);
-  UART_send_async(conversion_buf, len);
+  SEND_STR(conversion_buf, len);
 
-  UART_send_async((uint8_t*)"\n\r Miscellaneous: ", 18);
+  SEND_STR((uint8_t*)"\n\r Miscellaneous: ", 18);
   len = my_itoa(*count_misc, conversion_buf, BASE_10);
-  UART_send_async(conversion_buf, len);
-  UART_send_async((uint8_t*)"\n\r", 2);
+  SEND_STR(conversion_buf, len);
+  SEND_STR((uint8_t*)"\n\r", 2);
 
   /* clear counts */
   *count_alpha = 0;
@@ -77,21 +77,31 @@ void dump_statistics(uint32_t * count_alpha,
 
 void project2()
 {
+#ifdef PLATFORM_KL25Z
   /* set up uart */
   CB_t * ptr_rx_buf;
   UART_configure(115200, &ptr_rx_buf);
+#endif
 
+#if defined PLATFORM_HOST || defined PLATFORM_kl25Z
   uint32_t count_alpha = 0;
   uint32_t count_numeric = 0;
   uint32_t count_punctuation = 0;
   uint32_t count_white_space = 0;
   uint32_t count_misc = 0;
+#endif
 
   while(1)
   {
+#if defined PLATFORM_HOST || defined PLATFORM_kl25Z
     /* process any data in the Rx buffer */
     __cbdata_t data;
+
+#ifdef PLATFORM_HOST
+    if( (data = getchar()) )
+#else
     if( CB_buffer_remove_item(ptr_rx_buf, &data) == CB_SUCCESS )
+#endif
     {
       uint8_t rx_char = (uint8_t)data;
 
@@ -125,11 +135,16 @@ void project2()
       }
 
       /* print data on EOF */
+#ifdef PLATFORM_HOST
+      if((int8_t)rx_char == EOF)
+#else
       if(rx_char == 0x04)
+#endif
       {
         dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
       }
     }
+#endif /* defined PLATFORM_HOST || defined PLATFORM_kl25Z */
   }
 }
 
