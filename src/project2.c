@@ -28,7 +28,7 @@
 #ifdef PLATFORM_KL25Z
 #include "gpio.h"
 #include "uart.h"
-#endif
+#endif /* PLATFORM_KL25Z */
 
 void dump_statistics(uint32_t * count_alpha,
                      uint32_t * count_numeric,
@@ -81,16 +81,15 @@ void project2()
   /* set up uart */
   CB_t * ptr_rx_buf;
   UART_configure(115200, &ptr_rx_buf);
-#endif
+#endif /* PLATFORM_KL25Z */
 
-#if defined PLATFORM_HOST || defined PLATFORM_KL25Z
   uint32_t count_alpha = 0;
   uint32_t count_numeric = 0;
   uint32_t count_punctuation = 0;
   uint32_t count_white_space = 0;
   uint32_t count_misc = 0;
 
-#ifdef PLATFORM_HOST
+#if defined PLATFORM_HOST || defined PLATFORM_BBB
   uint8_t data;
   while( scanf("%c", &data) != EOF )
   {
@@ -100,7 +99,7 @@ void project2()
   while(1)
   {
     if( CB_buffer_remove_item(ptr_rx_buf, &data) == CB_SUCCESS )
-#endif
+#endif /* PLATFORM_HOST || PLATFORM_BBB */
     {
       uint8_t rx_char = (uint8_t)data;
 
@@ -139,13 +138,11 @@ void project2()
       {
         dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
       }
-#endif
+#endif /* PLATFORM_KL25Z */
     }
   }
 
-  /* print data on EOF - HOST */
+  /* print data on EOF - HOST or BBB */
   dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
 
-#endif /* defined PLATFORM_HOST || defined PLATFORM_KL25Z */
 }
-

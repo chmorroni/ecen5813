@@ -244,7 +244,9 @@ UART_e UART_receive_n(uint8_t * data, uint32_t bytes)
 
 void UART0_IRQHandler()
 {
-  if(UART0_S1 & UART0_S1_RDRF_MASK)
+  /* Must handle both Tx and Rx interrupts */
+  /* Must handle both if both are available */
+  if(UART0_S1 & UART0_S1_RDRF_MASK) /* Rx interrupt */
   {
     /* fetch data, this clears the interrupt */
     uint8_t data = UART0_D;
@@ -254,7 +256,7 @@ void UART0_IRQHandler()
     }
   }
   if(UART0_C2 & UART0_C2_TIE_MASK &&
-     UART0_S1 & UART0_S1_TDRE_MASK)
+     UART0_S1 & UART0_S1_TDRE_MASK) /* Tx interrupt */
   {
     uint8_t data;
     CB_e ret = CB_buffer_remove_item(ptr_uart_tx_circ_buf, (__cbdata_t *)&data);
