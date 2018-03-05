@@ -29,8 +29,8 @@
 
 typedef struct {
   uint8_t * str;
-  uint32_t length;
-  uint32_t crc;
+  uint32_t len;
+  uint16_t crc;
 } __cbdata_t;
 
 /**
