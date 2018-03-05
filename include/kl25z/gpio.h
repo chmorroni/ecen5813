@@ -130,4 +130,9 @@ __attribute__((always_inline)) static inline void Toggle_Red_LED()
   RGB_RED_TOGGLE();
 }
 
+/**
+ * @brief Initialize the GPIO pins associated with the nrf and spi devices
+ */
+void GPIO_nrf_init();
+
 #endif /* _GPIO_H_ */

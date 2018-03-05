@@ -42,3 +42,18 @@ void GPIO_Configure()
   GPIOB_PDDR |= (1 << 19);
   GPIOD_PDDR |= (1 << 1);
 }
+
+void GPIO_nrf_init() {
+  /* Set up SPI pins */
+  /* Clock: SPSCK */
+  PORTD_PCR1 = PORT_PCR_MUX(0x2);
+  /* Output: MOSI */
+  PORTD_PCR2 = PORT_PCR_MUX(0x2);
+  /* Input: MISO */
+  PORTD_PCR3 = PORT_PCR_MUX(0x2);
+  /* Do CS manually via GPIO */
+  PORTD_PCR0 = PORT_PCR_MUX(0x1);
+  /* Drive CS high at first */
+  GPIOD_PSOR |= (1 << 0);
+}
+
