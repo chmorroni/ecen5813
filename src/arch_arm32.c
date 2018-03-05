@@ -26,30 +26,36 @@ __attribute__((always_inline)) inline uint32_t ARM32_AIRCR_get_endianness_settin
   return ( (__AIRCR & __AIRCR_ENDIANNESS_MASK) >> __AIRCR_ENDIANNESS_OFFSET );
 }
 
-__attribute__((always_inline)) inline uint32_t ARM32_CCR_get_stack_alignment() {
+__attribute__((always_inline)) inline uint32_t ARM32_CCR_get_stack_alignment()
+{
   return ( (__CCR & __CCR_STK_ALIGNMENT_MASK) >> __CCR_STK_ALIGNMENT_OFFSET );
 }
 
-__attribute__((always_inline)) inline uint32_t ARM32_CPUID_get_part_number() {
+__attribute__((always_inline)) inline uint32_t ARM32_CPUID_get_part_number()
+{
   return ( (__CPUID & __CPUID_PART_NO_MASK) >> __CPUID_PART_NO_OFFSET );
 }
 
-__attribute__((always_inline)) inline void ARM32_CCR_enable_divide_by_zero_trap() {
+__attribute__((always_inline)) inline void ARM32_CCR_enable_divide_by_zero_trap()
+{
   __CCR |= __CCR_DIVIDE_BY_ZERO_TRAP_MASK;
 }
 
-__attribute__((always_inline)) inline void ARM32_CCR_enable_unaligned_access_trap() {
+__attribute__((always_inline)) inline void ARM32_CCR_enable_unaligned_access_trap()
+{
   __CCR |= __CCR_UNALIGNED_ACCESS_TRAP_MASK;
 }
 
-void ARM32_create_unaligned_access_trap() {
+void ARM32_create_unaligned_access_trap()
+{
   uint32_t dummy_variable = 0;
   void * dangerous_pointer = (void*)&dummy_variable;
   dangerous_pointer = (void*)( (uint32_t)(dangerous_pointer) + 1 );
   dummy_variable = *((uint32_t*)dangerous_pointer); /* trap should occur here */
 }
 
-void ARM32_create_divide_by_zero_trap() {
+void ARM32_create_divide_by_zero_trap()
+{
   uint32_t dummy_variable = 32;
   uint32_t other_dummy_variable = 0;
   dummy_variable /= other_dummy_variable; /* trap should occur here */

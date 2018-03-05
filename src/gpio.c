@@ -24,7 +24,8 @@
 #include "gpio.h"
 #include "MKL25Z4.h"
 
-void GPIO_Configure() {
+void GPIO_Configure()
+{
   /* Enable clock gating for LED pins */
   SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
   SIM_SCGC5 |= SIM_SCGC5_PORTD_MASK;

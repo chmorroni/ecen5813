@@ -34,7 +34,8 @@ typedef uint8_t __cbdata_t;
  *
  * Circular buffer data structure
  */
-typedef struct {
+typedef struct
+{
   __cbdata_t * bmp; /** Base memory pointer */
   __cbdata_t * head; /** Top of circular buffer */
   __cbdata_t * tail; /** Bottom of circular buffer */
@@ -48,7 +49,8 @@ typedef struct {
  * Enumeration of different status and error codes that are returned by
  * circular buffer handling functions.
  */
-typedef enum {
+typedef enum
+{
   CB_SUCCESS, /** Function completed successfully */
   CB_NULL_PTR, /** Null pointer passed to function */
   CB_BAD_MALLOC, /** Failed to allocate memory */
@@ -110,7 +112,8 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data);
  *
  * @return A circular buffer status code
  */
-__attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer) {
+__attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer)
+{
   return buffer->count == buffer->size;
 }
 
@@ -121,7 +124,8 @@ __attribute__((always_inline)) inline CB_e CB_is_full(CB_t * buffer) {
  *
  * @return A circular buffer status code
  */
-__attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer) {
+__attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer)
+{
   return buffer->count == 0;
 }
 

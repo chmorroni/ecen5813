@@ -24,7 +24,8 @@
 #include "circbuf.h"
 #include <stdint.h>
 
-CB_e CB_init(CB_t ** buffer, size_t len) {
+CB_e CB_init(CB_t ** buffer, size_t len)
+{
   /* Check that input to function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (len < 1) return CB_BAD_LEN;
@@ -48,7 +49,8 @@ CB_e CB_init(CB_t ** buffer, size_t len) {
   return CB_SUCCESS;
 }
 
-CB_e CB_destroy(CB_t ** buffer) {
+CB_e CB_destroy(CB_t ** buffer)
+{
   /* Check that input to function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (*buffer == NULL) return CB_NULL_PTR;
@@ -65,7 +67,8 @@ CB_e CB_destroy(CB_t ** buffer) {
   return CB_SUCCESS;
 }
 
-CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
+CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data)
+{
   /* Check that input to function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   /* Check that data can actually be added */
@@ -77,10 +80,13 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   /* Place new data at head pointer */
   *(buffer->head) = data;
   /* Move head to next available space */
-  if (buffer->head == buffer->bmp + buffer->size - 1) {
+  if (buffer->head == buffer->bmp + buffer->size - 1)
+  {
     /* If we're out of space, loop around */
     buffer->head = buffer->bmp;
-  } else {
+  }
+  else
+  {
     /* If we have space, just advance the head */
     (buffer->head)++;
   }
@@ -92,7 +98,8 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data) {
   return CB_SUCCESS;
 }
 
-CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
+CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data)
+{
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   /* Check that data can actually be removed */
@@ -104,10 +111,13 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   /* Retrieve data from the tail of the buffer */
   *data = *(buffer->tail);
   /* Move tail to next space */
-  if (buffer->tail == buffer->bmp + buffer->size - 1) {
+  if (buffer->tail == buffer->bmp + buffer->size - 1)
+  {
     /* If we're out of space, loop around */
     buffer->tail = buffer->bmp;
-  } else {
+  }
+  else
+  {
     /* If we have space, just advance the tail */
     (buffer->tail)++;
   }
@@ -119,7 +129,8 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data) {
   return CB_SUCCESS;
 }
 
-CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
+CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data)
+{
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (data == NULL) return CB_NULL_PTR;
@@ -128,9 +139,12 @@ CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data) {
   __cbdata_t * item = buffer->head;
   /* Walk through buffer */
   while (pos > 0) {
-    if (item == buffer->bmp + buffer->size) {
+    if (item == buffer->bmp + buffer->size)
+    {
       item = buffer->bmp;
-    } else {
+    }
+    else
+    {
       item++;
     }
     pos--;

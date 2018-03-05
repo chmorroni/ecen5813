@@ -28,7 +28,8 @@ void print_array(uint8_t * start, uint32_t length)
 #ifdef DEBUG
   uint8_t i;
 	PRINTF(" -- ");
-  for (i = 0; i < length; i++) {
+  for (i = 0; i < length; i++)
+  {
     PRINTF("%.2x ", *(start + i));
   }
 	PRINTF("\n");

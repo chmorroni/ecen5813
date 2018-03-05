@@ -26,8 +26,8 @@
 #include "MKL25Z4.h"
 #include "circbuf.h"
 
-static CB_t * ptr_uart_tx_circ_buf;
-static CB_t * ptr_uart_rx_circ_buf;
+static CB_t * ptr_uart_tx_circ_buf == NULL;
+static CB_t * ptr_uart_rx_circ_buf == NULL;
 
 UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
 {
