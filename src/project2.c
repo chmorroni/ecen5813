@@ -83,23 +83,22 @@ void project2()
   UART_configure(115200, &ptr_rx_buf);
 #endif
 
-#if defined PLATFORM_HOST || defined PLATFORM_kl25Z
+#if defined PLATFORM_HOST || defined PLATFORM_KL25Z
   uint32_t count_alpha = 0;
   uint32_t count_numeric = 0;
   uint32_t count_punctuation = 0;
   uint32_t count_white_space = 0;
   uint32_t count_misc = 0;
-#endif
-
-  while(1)
-  {
-#if defined PLATFORM_HOST || defined PLATFORM_kl25Z
-    /* process any data in the Rx buffer */
-    __cbdata_t data;
 
 #ifdef PLATFORM_HOST
-    if( (data = getchar()) )
+  uint8_t data;
+  while( scanf("%c", &data) != EOF )
+  {
+    if(data)
 #else
+  __cbdata_t data;
+  while(1)
+  {
     if( CB_buffer_remove_item(ptr_rx_buf, &data) == CB_SUCCESS )
 #endif
     {
@@ -134,17 +133,19 @@ void project2()
         count_misc++;
       }
 
-      /* print data on EOF */
-#ifdef PLATFORM_HOST
-      if((int8_t)rx_char == EOF)
-#else
+#ifdef PLATFORM_KL25Z
+      /* print data on EOF - KL25Z */
       if(rx_char == 0x04)
-#endif
       {
         dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
       }
+#endif
     }
-#endif /* defined PLATFORM_HOST || defined PLATFORM_kl25Z */
   }
+
+  /* print data on EOF - HOST */
+  dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
+
+#endif /* defined PLATFORM_HOST || defined PLATFORM_KL25Z */
 }
 
