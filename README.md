@@ -17,6 +17,7 @@ Build Targets:
 * redo - Cleans then rebuilds
 * install - Builds then installs on target
 * uninstall - Uninstalls from target
+* debug - Builds then debugs on target
 * test - Builds and runs cmocka unit tests
 * testclean - Cleans files generated for unit tests
 

@@ -22,6 +22,7 @@
 #     redo - Cleans then rebuilds
 #     install - Builds then installs on target
 #     uninstall - Uninstalls from target
+#     debug - Builds then debugs on target
 #     test - Builds and runs cmocka unit tests
 #     testclean - Cleans files generated for unit tests
 #
@@ -55,6 +56,7 @@ PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
 MAPFILE:=project2.map
 INSTALL_FLAGS=-n KL25Z -b $(TARGET)
+DEBUG_FLAGS=-b $(SECONDARY_TARGET)
 endif
 
 ifeq ($(PLATFORM),BBB)
@@ -71,6 +73,7 @@ BBB_ADDRESS:=192.168.7.2
 MAPFILE:=project2.map
 INSTALL_PATH:=/home/debian/bin
 INSTALL_FLAGS=$(BBB_ADDRESS) $(TARGET) $(INSTALL_PATH) # Needs to be recursive
+DEBUG_FLAGS=-b $(TARGET)
 endif
 
 ifeq ($(PLATFORM),HOST)
@@ -85,6 +88,7 @@ INCLUDE_FLAGS:=-Iinclude/common
 MAPFILE:=project2.map
 INSTALL_PATH:=/usr/local/bin
 INSTALL_FLAGS=-e $(TARGET) -p $(INSTALL_PATH) -f
+DEBUG_FLAGS=-b $(TARGET)
 endif
 
 ifeq ($(VERBOSE),TRUE)
@@ -164,6 +168,9 @@ install: $(TARGET)
 
 uninstall:
 	$(SH) script/install_$(PLATFORM).sh $(INSTALL_FLAGS) -u
+
+debug: $(TARGET)
+	$(SH) script/debug_$(PLATFORM).sh $(DEBUG_FLAGS)
 
 test: $(TEST_DEP_OBJ) $(TEST_OBJ)
 	$(CC) $(TEST_CFLAGS) $(TEST_OBJ) $(TEST_DEP_OBJ) -o build/test -l cmocka
