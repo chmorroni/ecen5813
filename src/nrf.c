@@ -27,7 +27,7 @@
 
 uint8_t nrf_read_register(uint8_t reg) {
   /* Use 5 least significant bits of parameter as address */
-  reg &= 0x1F;
+  reg &= 0x1F; /* Zero 3 most significant bits */
   nrf_chip_enable();
   SPI_write_byte(reg);
   uint8_t result;
@@ -38,7 +38,8 @@ uint8_t nrf_read_register(uint8_t reg) {
 
 void nrf_write_register(uint8_t reg, uint8_t value) {
   /* Use 5 least significant bits of parameter as address */
-  reg &= 0x1F;
+  reg &= 0x1F; /* Zero 3 most significant bits */
+  reg |= 0x20; /* mark as write command */
   nrf_chip_enable();
   SPI_write_byte(reg);
   SPI_write_byte(value);
@@ -74,10 +75,24 @@ void nrf_write_rf_ch(uint8_t channel) {
 }
 
 void nrf_read_TX_ADDR(uint8_t * address) {
-  
+  uint8_t cmd = NRF_TXADDR_REG & 0x1F; /* Zero 3 most significant bits */
+  nrf_chip_enable();
+  SPI_write_byte(cmd);
+  /* TX_ADDR is always 40 bits = 5 bytes */
+  size_t i;
+  for (i = 0; i < 5; i++) {
+    SPI_read_byte(address + i);
+  }
+  nrf_chip_disable();
 }
 
 void nrf_write_TX_ADDR(uint8_t * tx_addr) {
+  uint8_t cmd = NRF_TXADDR_REG & 0x1F; /* Zero 3 most significant bits */
+  cmd |= 0x20; /* Mark as write command */
+  nrf_chip_enable();
+  SPI_write_byte(cmd);
+  SPI_send_packet(tx_addr, 5); /* TX_ADDR is always 40 bits */
+  nrf_chip_disable();
 }
 
 uint8_t nrf_read_fifo_status() {
