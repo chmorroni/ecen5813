@@ -65,9 +65,6 @@ void project4()
 #endif /* PLATFORM_KL25Z */
   
   log_pkt(SYSTEM_INITIALIZED, 0, 0, NULL);
-  
-  char str[] = "Some log info.";
-  log_pkt(INFO, 0, 14, str);
 
   /* Begin profiling */
   log_pkt(PROFILING_STARTED, 0, 0, NULL);
