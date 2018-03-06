@@ -23,7 +23,15 @@
 #include <stdint.h>
 #include <stddef.h> /* NULL and size_t */
 
+#include "gpio.h"
+#include "spi.h"
 #include "nrf.h"
+
+void nrf_init() {
+  GPIO_nrf_init();
+  SPI_init();
+  nrf_transmit_enable();
+}
 
 uint8_t nrf_read_register(uint8_t reg) {
   /* Use 5 least significant bits of parameter as address */

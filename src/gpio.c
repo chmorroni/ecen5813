@@ -53,7 +53,11 @@ void GPIO_nrf_init() {
   PORTD_PCR3 = PORT_PCR_MUX(0x2);
   /* Do CS manually via GPIO */
   PORTD_PCR0 = PORT_PCR_MUX(0x1);
+  /* Also need an nRF chip enable pin */
+  PORTD_PCR4 = PORT_PCR_MUX(0x1);
   /* Drive CS high at first */
   GPIOD_PSOR |= (1 << 0);
+  /* And disable nRF chip at first */
+  GPIOD_PCOR |= (1 << 4);
 }
 

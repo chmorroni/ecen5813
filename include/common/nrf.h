@@ -37,6 +37,11 @@
 #define NRF_POWER_UP_MASK (0x02)
 
 /**
+ * @brief Initialize nRF interface with SPI
+ */
+void nrf_init();
+
+/**
  * @brief Read the register and return the value
  * @param register The register
  * @return The value
@@ -122,19 +127,19 @@ void nrf_flush_tx_fifo();
 void nrf_flush_rx_fifo();
 
 __attribute__((always_inline)) inline void nrf_chip_enable() {
-  GPIOD_PCOR |= (1 << 0);
+  GPIOD_PCOR |= (1 << 0); /* Set CSN low */
 }
   
 __attribute__((always_inline)) inline void nrf_chip_disable() {
-  GPIOD_PSOR |= (1 << 0);
+  GPIOD_PSOR |= (1 << 0); /* Set CSN high */
 }
 
 __attribute__((always_inline)) inline void nrf_transmit_enable() {
-  
+  GPIOD_PSOR |= (1 << 4); /* Set CE high */
 }
 
 __attribute__((always_inline)) inline void nrf_transmit_disable() {
-  
+  GPIOD_PCOR |= (1 << 4); /* Set CE low */
 }
 
 #endif
