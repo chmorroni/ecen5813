@@ -51,43 +51,31 @@ void SPI_init() {
 
 void SPI_read_byte(uint8_t * byte) {
   if (byte == NULL) return;
-  /* Drive CS low */
-  GPIOD_PCOR |= (1 << 0);
   /* Wait for data to be available */
   while (!(SPI0_S & (1 << 7))) { }
   /* Write data */
   (*byte) = SPI0_D;
-  /* Drive CS high */
-  GPIOD_PSOR |= (1 << 0);
 }
 
 void SPI_write_byte(uint8_t byte) {
   /* Wait for buffer to be empty */
   while (!(SPI0_S & (1 << 5))) { }
-  /* Drive CS low */
-  GPIOD_PCOR |= (1 << 0);
   /* Write data */
   SPI0_D = byte;
   /* Wait for buffer to be empty */
   while (!(SPI0_S & (1 << 5))) { }
-  /* Drive CS high */
-  GPIOD_PSOR |= (1 << 0);
 }
 
 void SPI_send_packet(uint8_t * p, size_t length) {
   if (p == NULL) return;
   /* Wait for buffer to be empty */
   while (!(SPI0_S & (1 << 5))) { }
-  /* Drive CS low */
-  GPIOD_PCOR |= (1 << 0);
   for (; p < (p + length); p++) {
     /* Write data */
     SPI0_D = *p;
     /* Wait for buffer to be empty */
     while (!(SPI0_S & (1 << 5))) { }
   }
-  /* Drive CS high */
-  GPIOD_PSOR |= (1 << 0);
 }
 
 void SPI_flush() {

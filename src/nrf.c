@@ -25,3 +25,21 @@
 
 #include "nrf.h"
 
+
+
+uint8_t nrf_read_register(uint8_t register) {
+  
+}
+
+
+void nrf_flush_tx_fifo() {
+  nrf_chip_enable();
+  SPI_write_byte(0xc1);
+  nrf_chip_disable();
+}
+
+void nrf_flush_rx_fifo() {
+  nrf_chip_enable();
+  SPI_write_byte(0xc2);
+  nrf_chip_disable();
+}
