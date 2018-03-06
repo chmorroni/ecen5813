@@ -25,54 +25,63 @@
 
 #include "nrf.h"
 
-
-
-uint8_t nrf_read_register(uint8_t register) {
-  
+uint8_t nrf_read_register(uint8_t reg) {
+  /* Use 5 least significant bits of parameter as address */
+  reg &= 0x1F;
+  nrf_chip_enable();
+  SPI_write_byte(reg);
+  uint8_t result;
+  SPI_read_byte(&result);
+  nrf_chip_disable();
+  return result;
 }
 
-void nrf_write_register(uint8_t register, uint8_t value) {
-
+void nrf_write_register(uint8_t reg, uint8_t value) {
+  /* Use 5 least significant bits of parameter as address */
+  reg &= 0x1F;
+  nrf_chip_enable();
+  SPI_write_byte(reg);
+  SPI_write_byte(value);
+  nrf_chip_disable();
 }
 
 uint8_t nrf_read_status() {
-
+  return nrf_read_register(NRF_STATUS_REG);
 }
 
 void nrf_write_config(uint8_t config) {
-
+  nrf_write_register(NRF_CONFIG_REG, config);
 }
 
 uint8_t nrf_read_config() {
-
+  return nrf_read_register(NRF_CONFIG_REG);
 }
 
 uint8_t nrf_read_rf_setup() {
-
+  return nrf_read_register(NRF_RF_SETUP_REG);
 }
 
 void nrf_write_rf_setup(uint8_t config) {
-
+  nrf_write_register(NRF_RF_SETUP_REG, config);
 }
 
 uint8_t nrf_read_rf_ch() {
-
+  return nrf_read_register(NRF_RF_CH_REG);
 }
 
 void nrf_write_rf_ch(uint8_t channel) {
-
+  nrf_write_register(NRF_RF_CH_REG, channel);
 }
 
 void nrf_read_TX_ADDR(uint8_t * address) {
-
+  
 }
 
 void nrf_write_TX_ADDR(uint8_t * tx_addr) {
-
 }
 
 uint8_t nrf_read_fifo_status() {
-
+  return nrf_read_register(NRF_FIFO_STATUS_REG);
 }
 
 void nrf_flush_tx_fifo() {

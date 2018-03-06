@@ -26,8 +26,12 @@
 #include "spi.h"
 
 /* Constants */
-#define NRF_STATUS_REG (0x00)
+#define NRF_CONFIG_REG (0x00)
+#define NRF_RF_CH_REG (0x05)
+#define NRF_RF_SETUP_REG (0x06)
+#define NRF_STATUS_REG (0x07)
 #define NRF_TXADDR_REG (0x10)
+#define NRF_FIFO_STATUS_REG (0x17)
 #define NRF_POWER_UP (1)
 #define NRF_POWER_DOWN (0)
 #define NRF_POWER_UP_MASK (0x02)
