@@ -11,35 +11,34 @@
  *
  *****************************************************************************/
 /**
- * @file main.c
- * @brief Main file for ECEN 5813
+ * @file dma.c
+ * @brief Memory manipulation with DMA
+ *
+ * This file contains the definitions for functions to
+ * manipulate memory using DMA.
  *
  * @author Christopher Morroni
- * @date 01/30/2018
+ * @date 2018-04-07
  */
 
 #include <stdint.h>
+#include <stddef.h> /* for size_t and NULL */
+#include "dma.h"
 
-#ifdef PROJECT1
-#include "project1.h"
-#endif
-#ifdef PROJECT2
-#include "project2.h"
-#endif
-#ifdef PROJECT3
-#include "project3.h"
-#endif
-
-int main()
+uint8_t * memmove_dma(uint8_t * src, uint8_t * dst, size_t length)
 {
-#ifdef PROJECT1
-  project1();
-#endif
-#ifdef PROJECT2
-  project2();
-#endif
-#ifdef PROJECT3
-  project3();
-#endif
-  return 0;
+  if (src == NULL || dst == NULL) {
+    return NULL;
+  }
+
+  return dst;
+}
+
+uint8_t * memset_dma(uint8_t * src, size_t length, uint8_t value)
+{
+  if (src == NULL) {
+    return NULL;
+  }
+
+  return src;
 }

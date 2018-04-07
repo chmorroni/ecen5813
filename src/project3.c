@@ -11,35 +11,23 @@
  *
  *****************************************************************************/
 /**
- * @file main.c
- * @brief Main file for ECEN 5813
+ * @file project3.c 
+ * @brief This file is to be used for project 3.
  *
  * @author Christopher Morroni
- * @date 01/30/2018
+ * @date 2018-04-07
+ *
  */
 
 #include <stdint.h>
-
-#ifdef PROJECT1
-#include "project1.h"
-#endif
-#ifdef PROJECT2
-#include "project2.h"
-#endif
-#ifdef PROJECT3
+#include "platform.h"
 #include "project3.h"
-#endif
 
-int main()
+#ifdef PLATFORM_KL25Z
+#include "dma.h"
+#endif /* PLATFORM_KL25Z */
+
+void project3()
 {
-#ifdef PROJECT1
-  project1();
-#endif
-#ifdef PROJECT2
-  project2();
-#endif
-#ifdef PROJECT3
-  project3();
-#endif
-  return 0;
+
 }
