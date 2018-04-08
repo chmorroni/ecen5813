@@ -22,6 +22,9 @@
 #ifndef __MEMORY_H__
 #define __MEMORY_H__
 
+#include <stdint.h>
+#include <stdlib.h>
+
 /**
  * @brief Copys a block of memory
  *

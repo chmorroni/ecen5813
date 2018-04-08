@@ -27,8 +27,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef uint8_t __cbdata_t;
-
 /**
  * @brief Circular buffer data structure
  *
@@ -36,11 +34,12 @@ typedef uint8_t __cbdata_t;
  */
 typedef struct
 {
-  __cbdata_t * bmp; /** Base memory pointer */
-  __cbdata_t * head; /** Top of circular buffer */
-  __cbdata_t * tail; /** Bottom of circular buffer */
+  void * bmp; /** Base memory pointer */
+  void * head; /** Top of circular buffer */
+  void * tail; /** Bottom of circular buffer */
   size_t size; /** Max size of circular buffer */
   size_t count; /** Current size of circular buffer */
+  size_t item_size; /** Size of each item in the circular buffer */
 } CB_t;
 
 /**
@@ -68,9 +67,10 @@ typedef enum
  * 
  * @param buffer A pointer to the circular buffer pointer to be allocated
  * @param len The length of the buffer to allocate in memory
+ * @param item_size The size of each item in the buffer
  * @return A circular buffer status code
  */
-CB_e CB_init(CB_t ** buffer, size_t len);
+CB_e CB_init(CB_t ** buffer, size_t len, size_t item_size);
 
 /**
  * @brief Destroy circular buffer
@@ -92,7 +92,7 @@ CB_e CB_destroy(CB_t ** buffer);
  * @param data Data to add to buffer
  * @return A circular buffer status code
  */
-CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data);
+CB_e CB_buffer_add_item(CB_t * buffer, void * ptr_data);
 
 /**
  * @brief Remove item from circular buffer
@@ -103,7 +103,7 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data);
  * @param data Pointer to where data removed from buffer will be stored
  * @return A circular buffer status code
  */
-CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data);
+CB_e CB_buffer_remove_item(CB_t * buffer, void * data);
 
 /**
  * @brief Check if circular buffer is full
@@ -140,6 +140,6 @@ __attribute__((always_inline)) inline CB_e CB_is_empty(CB_t * buffer)
  * @param data Pointer to where the data peeked from the buffer will be stored
  * @return A circular buffer status code
  */
-CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data);
+CB_e CB_peek(CB_t * buffer, size_t pos, void * data);
 
 #endif /* _CIRCBUF_H_ */

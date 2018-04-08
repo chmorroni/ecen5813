@@ -21,26 +21,29 @@
  */
 
 #include "platform.h"
+#include "memory.h"
 #include "circbuf.h"
 #include <stdint.h>
 
-CB_e CB_init(CB_t ** buffer, size_t len)
+CB_e CB_init(CB_t ** buffer, size_t len, size_t item_size)
 {
   /* Check that input to function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (len < 1) return CB_BAD_LEN;
+  if (item_size < 1) return CB_BAD_LEN;
 
   /* Allocate memory for circular buffer struct */
   (*buffer) = (CB_t*)malloc(sizeof(CB_t));
   if (*buffer == NULL) return CB_BAD_MALLOC;
 
   /* Allocate memory for circular buffer data */
-  (*buffer)->bmp = (__cbdata_t*)malloc(sizeof(__cbdata_t) * len);
+  (*buffer)->bmp = malloc(item_size * len);
   if ((*buffer)->bmp == NULL) return CB_BAD_MALLOC;
 
   /* Initialize buffer size and max size */
   (*buffer)->count = 0;
   (*buffer)->size = len;
+  (*buffer)->item_size = item_size;
   
   /* Initialize head and tail pointers */
   (*buffer)->head = (*buffer)->bmp;
@@ -67,10 +70,10 @@ CB_e CB_destroy(CB_t ** buffer)
   return CB_SUCCESS;
 }
 
-CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data)
+CB_e CB_buffer_add_item(CB_t * buffer, void * ptr_data)
 {
   /* Check that input to function is valid */
-  if (buffer == NULL) return CB_NULL_PTR;
+  if (buffer == NULL || ptr_data == NULL) return CB_NULL_PTR;
   /* Check that data can actually be added */
   if (buffer->count == buffer->size) return CB_FULL;
 
@@ -78,9 +81,9 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data)
   
   /* Push data to buffer */
   /* Place new data at head pointer */
-  *(buffer->head) = data;
+  my_memcpy(ptr_data, buffer->head, buffer->item_size);
   /* Move head to next available space */
-  if (buffer->head == buffer->bmp + buffer->size - 1)
+  if (buffer->head == buffer->bmp + buffer->size - buffer->item_size)
   {
     /* If we're out of space, loop around */
     buffer->head = buffer->bmp;
@@ -88,7 +91,7 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data)
   else
   {
     /* If we have space, just advance the head */
-    (buffer->head)++;
+    (buffer->head) += buffer->item_size;
   }
   /* Update current buffer size */
   buffer->count += 1;
@@ -98,7 +101,7 @@ CB_e CB_buffer_add_item(CB_t * buffer, __cbdata_t data)
   return CB_SUCCESS;
 }
 
-CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data)
+CB_e CB_buffer_remove_item(CB_t * buffer, void * data)
 {
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
@@ -109,9 +112,9 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data)
   
   /* Pop data from buffer */
   /* Retrieve data from the tail of the buffer */
-  *data = *(buffer->tail);
+  my_memcpy(buffer->tail, data, buffer->item_size);
   /* Move tail to next space */
-  if (buffer->tail == buffer->bmp + buffer->size - 1)
+  if (buffer->tail == buffer->bmp + buffer->size - buffer->item_size)
   {
     /* If we're out of space, loop around */
     buffer->tail = buffer->bmp;
@@ -119,7 +122,7 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data)
   else
   {
     /* If we have space, just advance the tail */
-    (buffer->tail)++;
+    (buffer->tail) += buffer->item_size;
   }
   /* Update current buffer size */
   buffer->count -= 1;
@@ -129,14 +132,14 @@ CB_e CB_buffer_remove_item(CB_t * buffer, __cbdata_t * data)
   return CB_SUCCESS;
 }
 
-CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data)
+CB_e CB_peek(CB_t * buffer, size_t pos, void * data)
 {
   /* Check that input to the function is valid */
   if (buffer == NULL) return CB_NULL_PTR;
   if (data == NULL) return CB_NULL_PTR;
   
   START_CRITICAL();
-  __cbdata_t * item = buffer->head;
+  void * item = buffer->head;
   /* Walk through buffer */
   while (pos > 0) {
     if (item == buffer->bmp + buffer->size)
@@ -145,11 +148,11 @@ CB_e CB_peek(CB_t * buffer, size_t pos, __cbdata_t * data)
     }
     else
     {
-      item++;
+      item += buffer->item_size;
     }
     pos--;
   }
-  *data = *item;
+  my_memcpy(item, data, buffer->item_size);
   END_CRITICAL();
    
   return CB_SUCCESS;

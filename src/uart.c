@@ -32,14 +32,14 @@ static CB_t * ptr_uart_rx_circ_buf = NULL;
 UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
 {
   /* initialize Tx buffer */
-  if( CB_init(&ptr_uart_tx_circ_buf, UART_TX_BUFFER_SIZE) != CB_SUCCESS ||
+  if( CB_init(&ptr_uart_tx_circ_buf, UART_TX_BUFFER_SIZE, sizeof(uint8_t)) != CB_SUCCESS ||
       ptr_uart_tx_circ_buf == NULL)
   {
     return UART_ERROR;
   }
 
   /* initialize Rx buffer */
-  if( CB_init(&ptr_uart_rx_circ_buf, UART_RX_BUFFER_SIZE) != CB_SUCCESS ||
+  if( CB_init(&ptr_uart_rx_circ_buf, UART_RX_BUFFER_SIZE, sizeof(uint8_t)) != CB_SUCCESS ||
       ptr_uart_rx_circ_buf == NULL)
   {
     return UART_ERROR;
@@ -188,7 +188,7 @@ UART_e UART_send_async(uint8_t * data, uint32_t bytes)
   for(i = 0; i < bytes; i++)
   {
     /* add data to buffer */
-    CB_e ret = CB_buffer_add_item(ptr_uart_tx_circ_buf, (__cbdata_t)*(data + i));
+    CB_e ret = CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)(data + i));
     if(ret == CB_FULL)
     {
       /* enable Tx interrupts if any data was added to the buffer */
@@ -250,7 +250,7 @@ void UART0_IRQHandler()
   {
     /* fetch data, this clears the interrupt */
     uint8_t data = UART0_D;
-    if( CB_buffer_add_item(ptr_uart_rx_circ_buf, (__cbdata_t)data) != CB_SUCCESS )
+    if( CB_buffer_add_item(ptr_uart_rx_circ_buf, (void *)&data) != CB_SUCCESS )
     {
       /* maybe log something, but there's not a whole lot else we can do */
     }
@@ -259,7 +259,7 @@ void UART0_IRQHandler()
      UART0_S1 & UART0_S1_TDRE_MASK) /* Tx interrupt */
   {
     uint8_t data;
-    CB_e ret = CB_buffer_remove_item(ptr_uart_tx_circ_buf, (__cbdata_t *)&data);
+    CB_e ret = CB_buffer_remove_item(ptr_uart_tx_circ_buf, (void *)&data);
 
     if(ret == CB_SUCCESS)
     {
