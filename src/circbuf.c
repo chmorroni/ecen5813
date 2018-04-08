@@ -83,7 +83,7 @@ CB_e CB_buffer_add_item(CB_t * buffer, void * ptr_data)
   /* Place new data at head pointer */
   my_memcpy(ptr_data, buffer->head, buffer->item_size);
   /* Move head to next available space */
-  if (buffer->head == buffer->bmp + buffer->size - buffer->item_size)
+  if (buffer->head == buffer->bmp + (buffer->size - 1) * buffer->item_size)
   {
     /* If we're out of space, loop around */
     buffer->head = buffer->bmp;
@@ -114,7 +114,7 @@ CB_e CB_buffer_remove_item(CB_t * buffer, void * data)
   /* Retrieve data from the tail of the buffer */
   my_memcpy(buffer->tail, data, buffer->item_size);
   /* Move tail to next space */
-  if (buffer->tail == buffer->bmp + buffer->size - buffer->item_size)
+  if (buffer->tail == buffer->bmp + (buffer->size - 1) * buffer->item_size)
   {
     /* If we're out of space, loop around */
     buffer->tail = buffer->bmp;
