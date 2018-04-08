@@ -27,6 +27,32 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define DMA_BUFFER_SIZE (32)
+
+typedef struct
+{
+  uint8_t * src;
+  uint8_t * dst;
+  size_t len;
+  uint32_t dcr;
+} dma_t;
+
+/**
+ * @brief Initializes DMA
+ *
+ * @return none
+ */
+void dma_init();
+
+/**
+ * @brief Starts next DMA transfer
+ *
+ * Pulls from the DMA buffer to start the next DMA transfer
+ *
+ * @return none
+ */
+void dma_start_next_transfer();
+
 /**
  * @brief Copies a block of memory
  *
@@ -56,5 +82,15 @@ uint8_t * memmove_dma(uint8_t * src, uint8_t * dst, size_t length);
  * @return A pointer to the source memory block
  */
 uint8_t * memset_dma(uint8_t * src, size_t length, uint8_t value);
+
+/**
+ *
+ * @brief The interrupt handler for DMA
+ *
+ * Checks the DMA buffer to see if there is another transfer queued
+ *
+ *@return none
+ */
+void DMA0_IRQHandler();
 
 #endif /* __DMA_H_ */
