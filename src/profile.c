@@ -32,6 +32,7 @@
 #include "dma.h"
 
 uint32_t systick_post_clock, systick_post_ctrl;
+extern uint32_t __StackTop, __StackLimit;
 
 #else
 #include <time.h>
@@ -336,5 +337,26 @@ void profile_dma(clock_t * ptr_move_avg, clock_t * ptr_set_avg, uint8_t * src, u
     *ptr_set_avg += elapsed_arr[i];
   }
   *ptr_set_avg /= PROFILE_NUM_REPS;
+}
+
+void watermark_stack()
+{
+  uint32_t * ptr_stack_limit = (uint32_t *)&__StackLimit;
+
+  uint32_t * i;
+  for(i = (uint32_t *)(&i - 1); i > ptr_stack_limit; i--)
+  {
+    *i = 0xA55AA55A;
+  }
+}
+
+uint32_t max_stack_used()
+{
+  uint32_t * ptr_stack_top = (uint32_t *)&__StackTop;
+  uint32_t * ptr_stack_limit = (uint32_t *)&__StackLimit;
+
+  uint32_t * i;
+  for(i = (uint32_t *)(&i - 1); i > ptr_stack_limit && *i != 0xA55AA55A; i--);
+  return ptr_stack_top - i;
 }
 #endif /* PLATFORM_KL25Z */

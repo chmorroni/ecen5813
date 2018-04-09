@@ -25,18 +25,19 @@
 #include <string.h>
 #include "memory.h"
 #include "platform.h"
+#include "profile.h"
 #include "project3.h"
 
 #ifdef PLATFORM_KL25Z
 #include "dma.h"
 #endif /* PLATFORM_KL25Z */
 
-#ifdef PROFILE
-#include "profile.h"
-#endif /* PROFILE */
-
 void project3()
 {
+
+#ifdef PLATFORM_KL25Z
+  watermark_stack();
+#endif /* PLATFORM_KL25Z */
 
 #ifdef PROFILE
   uint16_t profile_size_arr[] = PROFILE_SIZE_ARR;
@@ -87,7 +88,6 @@ void project3()
   }
 
 #ifdef PLATFORM_KL25Z
-  while(1);
 #else
   for(i = 0; i < PROFILE_SIZE_ARR_LEN; i++)
   {
@@ -127,4 +127,10 @@ void project3()
   memmove_dma(src, &src[10], 50);
   while(1);
 #endif /* DMA_TEST */
+
+#ifdef PLATFORM_KL25Z
+  uint32_t stack_used = max_stack_used();
+  if(stack_used);
+  while(1);
+#endif /* PLATFORM_KL25Z */
 }

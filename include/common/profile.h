@@ -117,6 +117,23 @@ void profile_opt_mem_lib(clock_t * ptr_move_avg, clock_t * ptr_set_avg, uint8_t 
  */
 #ifdef PLATFORM_KL25Z
 void profile_dma(uint32_t * ptr_move_avg, uint32_t * ptr_set_avg, uint8_t * src, uint8_t * dst, uint16_t block_size);
-#endif
+
+/**
+ * @brief watermarks the stack with 0xA55AA55A
+ *
+ * @return none
+ */
+void watermark_stack();
+
+/**
+ * @brief checks max stack utilization
+ *
+ * When run after watermark_stack, this function returns the maximum
+ * number of words in use at one time since watermarked.
+ *
+ * @return the max number of words used on the stack
+ */
+uint32_t max_stack_used();
+#endif /* PLATFORM_KL25Z */
 
 #endif /* __PROFILE_H__ */
