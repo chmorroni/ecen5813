@@ -32,6 +32,10 @@ static CB_t * ptr_dma_buffer = NULL;
 /* unless I come up with a clever way to use the heap without leaking memory */
 static uint8_t memset_val;
 
+#ifdef PROFILE
+extern uint32_t systick_post_clock, systick_post_ctrl;
+#endif /* PROFILE */
+
 void dma_init()
 {
   /* initialize buffer */
@@ -169,6 +173,10 @@ uint8_t * memset_dma(uint8_t * src, size_t length, uint8_t value)
 
 void DMA0_IRQHandler()
 {
+#ifdef PROFILE
+  systick_post_clock = SysTick->VAL;
+  systick_post_ctrl = SysTick->CTRL;
+#endif /* PROFILE */
   /* clear interrupt */
   DMA_DSR_BCR0 |= DMA_DSR_BCR_DONE(1);
 

@@ -25,3 +25,4 @@ Overrides:
 
 * PLATFORM - Platform for build (HOST, BBB, KL25Z)
 * VERBOSE - Include extra print statements (TRUE, assumes false)
+* PROFILE - Include code to profile memory operations (TRUE, assumes false)
