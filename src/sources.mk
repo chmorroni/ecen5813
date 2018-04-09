@@ -1,4 +1,4 @@
-CSRC:=conversion.c data.c debug.c main.c memory.c project3.c circbuf.c
+CSRC:=conversion.c data.c debug.c main.c memory.c memory_opt.c project3.c circbuf.c profile.c
 SSRC:=
 ifeq ($(PLATFORM),KL25Z)
 CSRC:=$(CSRC) system_MKL25Z4.c platform.c gpio.c uart.c arch_arm32.c dma.c
