@@ -31,10 +31,18 @@ uint8_t * my_memmove(uint8_t * src, uint8_t * dst, size_t length)
     return NULL;
   }
 
-  uint8_t * temp = (uint8_t*)malloc(length);
-  my_memcpy(src, temp, length);
-  my_memcpy(temp, dst, length);
-  free(temp);
+  if( src < dst && src + length > dst )
+  {
+    int32_t i;
+    for(i = length - 1; i >= 0; i--)
+    {
+      *(dst + i) = *(src + i);
+    }
+  }
+  else
+  {
+    my_memcpy(src, dst, length);
+  }
 
   return dst;
 }
