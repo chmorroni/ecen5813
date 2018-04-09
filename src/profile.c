@@ -338,7 +338,9 @@ void profile_dma(clock_t * ptr_move_avg, clock_t * ptr_set_avg, uint8_t * src, u
   }
   *ptr_set_avg /= PROFILE_NUM_REPS;
 }
+#endif /* PLATFORM_KL25Z */
 
+#ifdef PLATFORM_KL25Z
 void watermark_stack()
 {
   uint32_t * ptr_stack_limit = (uint32_t *)&__StackLimit;
@@ -349,7 +351,9 @@ void watermark_stack()
     *i = 0xA55AA55A;
   }
 }
+#endif /* PLATFORM_KL25Z */
 
+#ifdef PLATFORM_KL25Z
 uint32_t max_stack_used()
 {
   uint32_t * ptr_stack_top = (uint32_t *)&__StackTop;

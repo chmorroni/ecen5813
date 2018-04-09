@@ -29,7 +29,7 @@
 
 #define PROFILE_SIZE_ARR {10, 100, 1000, 5000}
 #define PROFILE_SIZE_ARR_LEN (4)
-#define PROFILE_NUM_REPS (10)
+#define PROFILE_NUM_REPS (100)
 
 /**
  * @brief initialize for the profiling functions
@@ -117,13 +117,16 @@ void profile_opt_mem_lib(clock_t * ptr_move_avg, clock_t * ptr_set_avg, uint8_t 
  */
 #ifdef PLATFORM_KL25Z
 void profile_dma(uint32_t * ptr_move_avg, uint32_t * ptr_set_avg, uint8_t * src, uint8_t * dst, uint16_t block_size);
+#endif /* PLATFORM_KL25Z */
 
 /**
  * @brief watermarks the stack with 0xA55AA55A
  *
  * @return none
  */
+#ifdef PLATFORM_KL25Z
 void watermark_stack();
+#endif /* PLATFORM_KL25Z */
 
 /**
  * @brief checks max stack utilization
@@ -133,6 +136,7 @@ void watermark_stack();
  *
  * @return the max number of words used on the stack
  */
+#ifdef PLATFORM_KL25Z
 uint32_t max_stack_used();
 #endif /* PLATFORM_KL25Z */
 
