@@ -24,4 +24,17 @@ my_memset_opt  | 3        | 3         | 3          | 6
 
 ---
 
+The above cycle counts are all using 8-bit transfers, which is not necessarily the fastest method for these transfers.
+With a 32-bit transfer size, the measured cycle counts could decrease by up to a factor of 4.
+
+The DMA memmove is significantly faster than the other options at or above 1000 bytes. Below that, the DMA has too much
+overhead to top the other functions, except the un-optimized version of my_memmove, where the transition point is 100 bytes.
+The DMA memset, however, only comes out ahead of our memset functions, and not the standard library.
+
+On the BeagleBone, the O3-optimized version of my_memset keeps pace with the standard library memset, but the optimized version of
+my_memmove does not. Both are faster than their non-optimized counterparts, especially for larger blocks. The cycle counts
+here are quite small, though, which prevents us from comparing further.
+
+---
+
 KL25Z Stack Utilization = 150 words
