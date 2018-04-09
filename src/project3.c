@@ -24,12 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "memory.h"
+#include "conversion.h"
 #include "platform.h"
 #include "profile.h"
 #include "project3.h"
 
 #ifdef PLATFORM_KL25Z
 #include "dma.h"
+#include "uart.h"
 #endif /* PLATFORM_KL25Z */
 
 void project3()
@@ -37,6 +39,10 @@ void project3()
 
 #ifdef PLATFORM_KL25Z
   watermark_stack();
+
+  /* set up UART */
+  CB_t * ptr_rx_buf;
+  UART_configure(115200, &ptr_rx_buf);
 #endif /* PLATFORM_KL25Z */
 
 #ifdef PROFILE
@@ -87,20 +93,63 @@ void project3()
     free(dst);
   }
 
-#ifdef PLATFORM_KL25Z
-#else
+  uint8_t conversion_buf[25], len;
+
+#ifndef PLATFORM_KL25Z
+  UNUSED(len);
+#endif /* PLATFORM_KL25Z */
+
+  SEND_STR((uint8_t*)"\n\r##############\n\r", 18);
+  SEND_STR((uint8_t*)"# Statistics #\n\r", 16);
+  SEND_STR((uint8_t*)"##############\n\r", 16);
+
   for(i = 0; i < PROFILE_SIZE_ARR_LEN; i++)
   {
-    printf("Block size: %d\n", profile_size_arr[i]);
-    printf("memmove avg: %ld\n", std_lib_move_avg[i]);
-    printf("memset avg: %ld\n", std_lib_set_avg[i]);
-    printf("my_memmove avg: %ld\n", mem_lib_move_avg[i]);
-    printf("my_memset avg: %ld\n", mem_lib_set_avg[i]);
-    printf("my_memmove_opt avg: %ld\n", opt_mem_lib_move_avg[i]);
-    printf("my_memset_opt avg: %ld\n", opt_mem_lib_set_avg[i]);
-    printf("\n");
-  }
+    SEND_STR((uint8_t*)" Block size: ", 13);
+    len = my_itoa(profile_size_arr[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r memmove: ", 12);
+    len = my_itoa(std_lib_move_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r memset: ", 11);
+    len = my_itoa(std_lib_set_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r my_memmove: ", 15);
+    len = my_itoa(mem_lib_move_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r my_memset: ", 14);
+    len = my_itoa(mem_lib_set_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    for(uint32_t j = 0; j < 10000; j++);
+
+    SEND_STR((uint8_t*)"\n\r my_memmove_opt: ", 19);
+    len = my_itoa(opt_mem_lib_move_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r my_memset_opt: ", 18);
+    len = my_itoa(opt_mem_lib_set_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+#ifdef PLATFORM_KL25Z
+    SEND_STR((uint8_t*)"\n\r memmove_dma: ", 16);
+    len = my_itoa(dma_move_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
+
+    SEND_STR((uint8_t*)"\n\r memset_dma: ", 15);
+    len = my_itoa(dma_set_avg[i], conversion_buf, BASE_10);
+    SEND_STR(conversion_buf, len);
 #endif /* PLATFORM_KL25Z */
+
+    SEND_STR((uint8_t*)"\n\r\n\r", 4);
+
+    for(uint32_t j = 0; j < 10000; j++);
+
+  }
 
 #endif /* PROFILE */
 
@@ -130,7 +179,12 @@ void project3()
 
 #ifdef PLATFORM_KL25Z
   uint32_t stack_used = max_stack_used();
-  if(stack_used);
+
+  SEND_STR((uint8_t*)" stack used (words): ", 21);
+  len = my_itoa(stack_used, conversion_buf, BASE_10);
+  SEND_STR(conversion_buf, len);
+  SEND_STR((uint8_t*)"\n\r\n\r", 4);
+
   while(1);
 #endif /* PLATFORM_KL25Z */
 }
