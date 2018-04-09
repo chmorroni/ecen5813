@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stddef.h> /* NULL and size_t */
 
+#include "platform.h"
 #include "gpio.h"
 #include "spi.h"
 #include "nrf.h"
