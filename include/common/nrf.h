@@ -23,6 +23,7 @@
 #ifndef _NRF_H_
 #define _NRF_H_
 
+#include "platform.h"
 #include "spi.h"
 
 /* Constants */
