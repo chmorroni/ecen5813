@@ -25,9 +25,11 @@
 #include "uart.h"
 #include "MKL25Z4.h"
 #include "circbuf.h"
+#include "log.h"
 
 static CB_t * ptr_uart_tx_circ_buf = NULL;
 static CB_t * ptr_uart_rx_circ_buf = NULL;
+CB_t * ptr_log_buf = NULL;
 
 UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
 {
@@ -46,6 +48,15 @@ UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
   }
 
   *rx_buf = ptr_uart_rx_circ_buf;
+
+#ifdef DEBUG
+  /* initialize log buffer */
+  if( CB_init(&ptr_log_buf, LOG_BUFFER_SIZE, sizeof(log_item_t)) != CB_SUCCESS ||
+      ptr_log_buf == NULL)
+  {
+    return UART_ERROR;
+  }
+#endif
 
   uint8_t oversampling_ratio = UART_DEFAULT_OVERSAMPLING_RATIO - 1;
   uint16_t baud_div = UART_CALC_BAUD_DIV(baud, oversampling_ratio);
@@ -128,6 +139,9 @@ UART_e UART_free_buffers()
 {
   CB_destroy(&ptr_uart_tx_circ_buf);
   CB_destroy(&ptr_uart_rx_circ_buf);
+#ifdef DEBUG
+  CB_destroy(&ptr_log_buf);
+#endif
 
   return UART_SUCCESS;
 }
@@ -210,6 +224,26 @@ UART_e UART_send_async(uint8_t * data, uint32_t bytes)
   return UART_SUCCESS;
 }
 
+UART_e UART_send_log(log_item_t * data)
+{
+  if(data == NULL)
+  {
+    return UART_NULL_PTR;
+  }
+
+  /* add data to buffer */
+  CB_e ret = CB_buffer_add_item(ptr_log_buf, (void *)data);
+  if(ret != CB_SUCCESS)
+  {
+    return UART_ERROR;
+  }
+
+  /* enable Tx interrupts */
+  UART0_C2 |= UART0_C2_TIE(1);
+
+  return UART_SUCCESS;
+}
+
 UART_e UART_receive(uint8_t * data)
 {
   if(data == NULL)
@@ -268,8 +302,33 @@ void UART0_IRQHandler()
     }
     else if(ret == CB_EMPTY)
     {
+#ifdef DEBUG
+      log_item_t log_item;
+      ret = CB_buffer_remove_item(ptr_log_buf, (void *)&log_item);
+
+      if(ret == CB_SUCCESS)
+      {
+        /* add log packet to the UART Tx buffer */
+        uint8_t i;
+        for(i = 0; i < 7; i++)
+        {
+          CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)((uint8_t *)&log_item + i));
+        }
+        for(i = 0; i < log_item.len; i++)
+        {
+          CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)(log_item.payload + i));
+        }
+        CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)&log_item.crc);
+      }
+      else
+      {
+        /* disable Tx interrupts when Tx buffer is empty and no log packets to send */
+        UART0_C2 &= ~UART0_C2_TIE(~0);
+      }
+#else
       /* disable Tx interrupts when Tx buffer is empty */
       UART0_C2 &= ~UART0_C2_TIE(~0);
+#endif /* DEBUG */
     }
     else
     {

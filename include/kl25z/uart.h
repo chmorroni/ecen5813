@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include "circbuf.h"
+#include "log.h"
 
 #define KL25Z_PROCESSOR_FREQ_MHZ (22.29)
 #define UART_DEFAULT_OVERSAMPLING_RATIO (16)
@@ -107,6 +108,18 @@ UART_e UART_send_n(uint8_t * data, uint32_t bytes);
  * @return An enumeration indicating success or failure
  */
 UART_e UART_send_async(uint8_t * data, uint32_t bytes);
+
+/**
+ * @brief Sends a log packet without blocking
+ *
+ * Sends a block of data by adding it to a buffer
+ * and enabling Tx interrupts to actually send the data
+ *
+ * @param data A pointer to the log packet
+ *
+ * @return An enumeration indicating success or failure
+ */
+UART_e UART_send_log(log_item_t * data);
 
 /**
  * @brief Receives a single byte of data from UART

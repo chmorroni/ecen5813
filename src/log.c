@@ -21,7 +21,11 @@
  */
 
 #include "conversion.h"
+#include "circbuf.h"
+#include "uart.h"
 #include "log.h"
+
+extern CB_t * ptr_log_buf;
 
 void log_data(void * data, uint8_t len)
 {
@@ -30,7 +34,7 @@ void log_data(void * data, uint8_t len)
 #endif
 }
 
-void log_string(uint8_t * str)
+void log_string(char * str)
 {
 #ifdef DEBUG
   PRINT_STR(str);
@@ -60,8 +64,40 @@ void log_flush()
 void log_item(log_item_t * log)
 {
 #ifdef DEBUG
-  PRINT_ITEM(log, sizeof(log->timestamp) + sizeof(log->id) + sizeof(log->source_id) + sizeof(log->len));
+  PRINT_ITEM((uint8_t *)log, sizeof(log->timestamp) + sizeof(log->id) + sizeof(log->source_id) + sizeof(log->len));
   PRINT_ITEM(log->payload, log->len);
-  PRINT_ITEM(&log->crc, sizeof(log->crc);
+  PRINT_ITEM(&log->crc, sizeof(log->crc));
 #endif
+}
+
+void log_item_async(log_item_t * log)
+{
+#ifdef DEBUG
+  UART_send_log(log);
+#endif
+}
+
+void log_pkt(log_id_t id, uint8_t source_id, uint8_t len, void * payload)
+{
+#ifdef DEBUG
+  log_item_t log_item;
+  log_item.timestamp = 0;
+  log_item.id = id;
+  log_item.source_id = source_id;
+  log_item.len = len;
+  log_item.payload = payload;
+
+  uint8_t i;
+  log_item.crc = 0;
+  for(i = 0; i < 7; i++)
+  {
+    log_item.crc ^= *((uint8_t *)&log_item + i);
+  }
+  for(i = 0; i < log_item.len; i++)
+  {
+    log_item.crc ^= *((uint8_t *)log_item.payload + i);
+  }
+
+  log_item_async(&log_item);
+#endif /* DEBUG */
 }

@@ -26,6 +26,8 @@
 #include <stdint.h>
 #include "platform.h"
 
+#define LOG_BUFFER_SIZE (16)
+
 /* Platform-specific logging functions */
 #ifdef PLATFORM_KL25Z
 #define PRINT_ITEM(IT, L) UART_send_n((IT), (L))
@@ -34,7 +36,7 @@
 #endif
 
 #ifdef PLATFORM_KL25Z
-#define PRINT_STR(STR) UART_send_str(STR)
+#define PRINT_STR(STR) UART_send_str((uint8_t *)STR)
 #else
 #define PRINT_STR(STR) printf("%s", (STR))
 #endif
@@ -86,7 +88,7 @@ void log_data(void * data, uint8_t len);
 /* 
  * @brief Logs c-style string to terminal
  */
-void log_string(uint8_t * str);
+void log_string(char * str);
 
 /*
  * @brief Logs integer to terminal
@@ -103,5 +105,15 @@ void log_flush();
  */
 /* don't need to pass length - part of the struct */
 void log_item(log_item_t * log);
+
+/*
+ * @brief Asynchronously sends a log packet
+ */
+void log_item_async(log_item_t * log);
+
+/*
+ * @brief Creates and sends log packet
+ */
+void log_pkt(log_id_t id, uint8_t source_id, uint8_t len, void * payload);
 
 #endif /* _LOG_H_ */
