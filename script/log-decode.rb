@@ -49,7 +49,7 @@ ARGV.each do |filename|
     unless crc == SimpleXorCRC(log_data)
       puts "[MALFORMED]"
     else
-      puts "#{source} - [#{timestamp} : #{log_ids[log_id.to_i]}] #{log_payload}"
+      puts "#{source} - [#{timestamp} : #{log_ids[log_id.unpack("C*").first]}] #{log_payload}"
     end
   end
 end
