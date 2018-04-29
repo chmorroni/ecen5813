@@ -28,38 +28,23 @@
 
 /* Platform-specific logging functions */
 #ifdef PLATFORM_KL25Z
-#define LOG_RAW_DATA(D, L) UART_send_n((D), (L))
+#define PRINT_ITEM(IT, L) UART_send_n((IT), (L))
 #else
-#define LOG_RAW_DATA(D, L) /* printf */
-#endif /* LOG_RAW_DATA */
+#define PRINT_ITEM(IT, L) printf("%.*s", (L), (IT))
+#endif
 
 #ifdef PLATFORM_KL25Z
-#define LOG_RAW_STRING(D) UART_send_str((D))
+#define PRINT_STR(STR) UART_send_str(STR)
 #else
-#define LOG_RAW_STRING(D) printf(D)
-#endif /* LOG_RAW_STRING */
+#define PRINT_STR(STR) printf("%s", (STR))
+#endif
 
 #ifdef PLATFORM_KL25Z
-#define LOG_RAW_INT(I) UART_send(itoa((I)))
-#else
-#define LOG_RAW_INT(I) printf("%d", (I))
-#endif /* LOG_RAW_INT */
+#define PRINT_ITEM_ASYNC(IT, L) UART_send_async((IT), (L))
+#endif
 
-#ifdef PLATFORM_KL25Z
-#define LOG_FLUSH() while (!(UART0_S1 & UART0_S1_TC_MASK));
-#else
-#define LOG_FLUSH() fflush(stdout);
-#endif /* LOG_FLUSH */
-
-#ifdef PLATFORM_KL25Z
-#define LOG_RAW_ITEM(IT) /* UART */
-#else
-#define LOG_RAW_ITEM(IT) /* printf */
-#endif /* LOG_RAW_ITEM */
-
-#define LOG_ITEM(IT, BUF) CB_buffer_add_item((BUF), (IT))
-
-typedef enum {
+typedef enum
+{
   SYSTEM_ID = 0,
   SYSTEM_VERSION,
   LOGGER_INITIALIZED,
@@ -83,19 +68,20 @@ typedef enum {
   CORE_DUMP
 } log_id_t;
 
-typedef struct {
-  log_id_t id;
-  uint8_t source_id;
+typedef struct
+{
   uint32_t timestamp;
+  uint8_t id;
+  uint8_t source_id;
   uint8_t len;
   uint8_t * payload;
-  uint32_t crc;
+  uint8_t crc;
 } log_item_t;
 
 /*
  * @brief Logs sequence of bytes to terminal
  */
-void log_data(uint8_t * data, uint8_t len);
+void log_data(void * data, uint8_t len);
 
 /* 
  * @brief Logs c-style string to terminal
@@ -105,7 +91,7 @@ void log_string(uint8_t * str);
 /*
  * @brief Logs integer to terminal
  */
-void log_integer(uint32_t i);
+void log_int(int32_t i);
 
 /*
  * @brief Blocks until current logger buffer is empty
