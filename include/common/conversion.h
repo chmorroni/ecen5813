@@ -22,6 +22,7 @@
 #ifndef __CONVERSIONS_H__
 #define __CONVERSIONS_H__
 
+#include <stdint.h>
 
 #define BASE_2 (2)
 #define BASE_8 (8)

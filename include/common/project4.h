@@ -11,41 +11,19 @@
  *
  *****************************************************************************/
 /**
- * @file main.c
- * @brief Main file for ECEN 5813
+ * @file project4.h 
+ * @brief This file is to be used for project 4.
  *
  * @author Christopher Morroni
- * @date 01/30/2018
+ * @date 2018-04-29
+ *
  */
+#ifndef __PROJECT4_H__
+#define __PROJECT4_H__
 
-#include <stdint.h>
+/**
+ * @brief function to run project 4 materials
+ */
+void project4();
 
-#ifdef PROJECT1
-#include "project1.h"
 #endif
-#ifdef PROJECT2
-#include "project2.h"
-#endif
-#ifdef PROJECT3
-#include "project3.h"
-#endif
-#ifdef PROJECT4
-#include "project4.h"
-#endif
-
-int main()
-{
-#ifdef PROJECT1
-  project1();
-#endif
-#ifdef PROJECT2
-  project2();
-#endif
-#ifdef PROJECT3
-  project3();
-#endif
-#ifdef PROJECT4
-  project4();
-#endif
-  return 0;
-}

@@ -51,11 +51,11 @@ AS:=arm-none-eabi-as
 LD:=arm-none-eabi-ld
 SIZE:=arm-none-eabi-size
 PLATFORM_FLAGS:=-mthumb -mcpu=cortex-m0plus -specs=nosys.specs -DPLATFORM_KL25Z
-TARGET:=project3-kl25z.srec
+TARGET:=project4-kl25z.srec
 SECONDARY_TARGET:=$(TARGET:.srec=.elf)
 PLATFORM_LDFLAGS:=-T platform/MKL25Z128xxx4_flash.ld
 INCLUDE_FLAGS:=-Iinclude/cmsis -Iinclude/kl25z -Iinclude/common
-MAPFILE:=project3.map
+MAPFILE:=project4.map
 INSTALL_FLAGS=-n KL25Z -b $(TARGET)
 DEBUG_FLAGS=-b $(SECONDARY_TARGET)
 endif
@@ -68,10 +68,10 @@ LD:=arm-linux-gnueabi-ld
 SIZE:=arm-linux-gnueabi-size
 PLATFORM_FLAGS:=-DPLATFORM_BBB
 PLATFORM_LDFLAGS:=-static
-TARGET:=project3-bbb.elf
+TARGET:=project4-bbb.elf
 INCLUDE_FLAGS:=-Iinclude/common
 BBB_ADDRESS:=192.168.7.2
-MAPFILE:=project3.map
+MAPFILE:=project4.map
 INSTALL_PATH:=/home/debian/bin
 INSTALL_FLAGS=$(BBB_ADDRESS) $(TARGET) $(INSTALL_PATH) # Needs to be recursive
 DEBUG_FLAGS=-b $(TARGET)
@@ -84,9 +84,9 @@ AS:=as
 LD:=ld
 SIZE:=size
 PLATFORM_FLAGS:=-DPLATFORM_HOST
-TARGET:=project3.elf
+TARGET:=project4.elf
 INCLUDE_FLAGS:=-Iinclude/common
-MAPFILE:=project3.map
+MAPFILE:=project4.map
 INSTALL_PATH:=/usr/local/bin
 INSTALL_FLAGS=-e $(TARGET) -p $(INSTALL_PATH) -f
 DEBUG_FLAGS=-b $(TARGET)
@@ -124,7 +124,7 @@ SECONDARY_TARGET:=$(addprefix build/,$(SECONDARY_TARGET))
 MAPFILE:=$(addprefix build/,$(MAPFILE))
 
 # Compiler options
-CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT3 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
+CFLAGS:=-Wall -Werror -g -O0 -std=c99 -DPROJECT4 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 LDFLAGS:=-std=c99 -g -O0 $(PLATFORM_LDFLAGS) $(PLATFORM_FLAGS) -Xlinker -Map=$(MAPFILE)
 CPPFLAGS:=-std=c99 $(PLATFORM_FLAGS) $(INCLUDE_FLAGS)
 
