@@ -1,5 +1,7 @@
 #! /usr/bin/env ruby
 
+verbose = true
+
 require 'zlib'
 
 log_ids = ["SYSTEM_ID", "SYSTEM_VERSION", "LOGGER_INITIALIZED", "GPIO_INITIALIZED", "SYSTEM_INITIALIZED", "SYSTEM_HALTED", "INFO", "WARNING", "ERROR", "PROFILING_STARTED", "PROFILING_RESULT", "PROFILING_COMPLETED", "DATA_RECEIVED", "DATA_ANALYSIS_STARTED", "DATA_ALPHA_COUNT", "DATA_NUMERIC_COUNT", "DATA_PUNCTUATION_COUNT", "DATA_MISC_COUNT", "DATA_ANALYSIS_COMPLETED", "HEARTBEAT", "CORE_DUMP"]
@@ -28,9 +30,11 @@ ARGV.each do |filename|
     log_data += ts_str
     #    lowercase b = LSB first; B for MSB
     timestamp = ts_str.unpack("b8b8b8b8").join.to_i(2)
+    puts "  timestamp: #{timestamp}" if verbose
     #  uint8_t id
     log_id = log_array.shift
     log_data += log_id
+    puts "  log ID: #{log_id.unpack("C*").first} (#{log_ids[log_id.unpack("C*").first]})" if verbose
     #  uint8_t source_id
     source_id = log_array.shift
     log_data += source_id
@@ -38,15 +42,19 @@ ARGV.each do |filename|
     source = "BBB" if source_id.unpack("C*").first == 1
     source = "KL25Z" if source_id.unpack("C*").first == 16
     source = "HOST" if source_id.unpack("C*").first == 0
+    puts "  source: #{source}" if verbose
     #  uint8_t len
     log_data_len = log_array.shift
     log_data += log_data_len
     log_data_len = log_data_len.unpack("C*").first
+    puts "  payload length: #{log_data_len}" if verbose
     #  uint8_t * payload
     log_payload = log_array.shift(log_data_len).join
     log_data += log_payload
+    puts "  payload: #{log_payload}" if verbose
     #  uint32_t crc
     crc = log_array.shift.unpack("C*").first
+    puts "  crc: #{SimpleXorCRC(log_data)} (given: #{crc})" if verbose
     unless crc == SimpleXorCRC(log_data)
       puts "[MALFORMED]"
     else
