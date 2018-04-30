@@ -204,6 +204,93 @@ void profile()
   }
 }
 
+void dump_statistics(uint32_t * count_alpha,
+                     uint32_t * count_numeric,
+                     uint32_t * count_punctuation,
+                     uint32_t * count_white_space,
+                     uint32_t * count_misc)
+{
+  log_send_packet(DATA_ALPHA_COUNT, sizeof(uint32_t), count_alpha);
+  log_send_packet(DATA_NUMERIC_COUNT, sizeof(uint32_t), count_numeric);
+  log_send_packet(DATA_PUNCTUATION_COUNT, sizeof(uint32_t), count_punctuation);
+//  log_send_packet(DATA_WHITE_COUNT, sizeof(uint32_t), count_white_space);
+  log_send_packet(DATA_MISC_COUNT, sizeof(uint32_t), count_misc);
+
+  /* clear counts */
+  *count_alpha = 0;
+  *count_numeric = 0;
+  *count_punctuation = 0;
+  *count_white_space = 0;
+  *count_misc = 0;
+}
+
+void data_analysis(CB_t * ptr_rx_buf)
+{
+  log_send_packet(DATA_ANALYSIS_STARTED, 0, NULL);
+
+  uint32_t count_alpha = 0;
+  uint32_t count_numeric = 0;
+  uint32_t count_punctuation = 0;
+  uint32_t count_white_space = 0;
+  uint32_t count_misc = 0;
+
+#if defined PLATFORM_HOST || defined PLATFORM_BBB
+  uint8_t rx_char;
+  while( scanf("%c", &rx_char) != EOF )
+  {
+    if(rx_char)
+#else
+  uint8_t rx_char;
+  while(1)
+  {
+    if( CB_buffer_remove_item(ptr_rx_buf, &rx_char) == CB_SUCCESS )
+#endif /* PLATFORM_HOST || PLATFORM_BBB */
+    {
+      /* interpret data */
+      if( (rx_char >= 'A' && rx_char <= 'Z') ||
+          (rx_char >= 'a' && rx_char <= 'z') )
+      {
+        count_alpha++;
+      }
+      else if(rx_char >= '0' && rx_char <= '9')
+      {
+        count_numeric++;
+      }
+      else if( (rx_char >= '!' && rx_char <= '/') ||
+               (rx_char >= ':' && rx_char <= '@') ||
+               (rx_char >= '[' && rx_char <= '`') ||
+               (rx_char >= '{' && rx_char <= '~') )
+      {
+        count_punctuation++;
+      }
+      else if( rx_char == ' ' ||
+               rx_char == '\n' ||
+               rx_char == '\r' ||
+               rx_char == '\t')
+      {
+        count_white_space++;
+      }
+      else
+      {
+        count_misc++;
+      }
+
+#ifdef PLATFORM_KL25Z
+      /* print data on EOF - KL25Z */
+      if(rx_char == 0x04)
+      {
+        dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
+      }
+#endif /* PLATFORM_KL25Z */
+    }
+  }
+
+  /* print data on EOF - HOST or BBB */
+  dump_statistics( &count_alpha, &count_numeric, &count_punctuation, &count_white_space, &count_misc );
+
+  log_send_packet(DATA_ANALYSIS_COMPLETED, 0, NULL);
+}
+
 void project4()
 {
 #ifdef PLATFORM_KL25Z
@@ -214,7 +301,14 @@ void project4()
   log_init();
   log_send_packet(LOGGER_INITIALIZED, 0, NULL);
   log_send_packet(SYSTEM_INITIALIZED, 0, NULL);
+
   profile();
+
+#ifdef PLATFORM_KL25Z
+  data_analysis(ptr_rx_buf);
+#else
+  data_analysis(NULL);
+#endif
   
 #ifdef PLATFORM_KL25Z
   while(1);

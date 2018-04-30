@@ -28,7 +28,7 @@
 #endif /* !PLATFORM_KL25Z */
 
 #define PROFILE_SIZE_ARR {10, 100, 1000, 5000}
-#define PROFILE_SIZE_ARR_LEN (4)
+#define PROFILE_SIZE_ARR_LEN (3)
 #define PROFILE_NUM_REPS (100)
 
 /**
