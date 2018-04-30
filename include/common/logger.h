@@ -11,7 +11,7 @@
  *
  *****************************************************************************/
 /**
- * @file log.h
+ * @file logger.h
  * @brief 
  *
  * 
@@ -20,29 +20,36 @@
  * @date 04/27/2018
  */
 
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef _LOGGER_H_
+#define _LOGGER_H_
 
 #include <stdint.h>
 #include "platform.h"
 
 #define LOG_BUFFER_SIZE (16)
+#define RTC_INITIAL_VAL (1525369500) /* scheduled demo time */
+
+#ifdef PLATFORM_KL25Z
+#define LOG_SOURCE_ID (0x10)
+#elif defined PLATFORM_BBB
+#define LOG_SOURCE_ID (0x01)
+#elif defined PLATFORM_HOST
+#define LOG_SOURCE_ID (0x00)
+#else
+#define LOG_SOURCE_ID (0xFF)
+#endif
 
 /* Platform-specific logging functions */
 #ifdef PLATFORM_KL25Z
 #define PRINT_ITEM(IT, L) UART_send_n((IT), (L))
 #else
-#define PRINT_ITEM(IT, L) printf("%.*s", (L), (IT))
+#define PRINT_ITEM(IT, L) printf("%.*s", (uint32_t)(L), (char *)(IT))
 #endif
 
 #ifdef PLATFORM_KL25Z
 #define PRINT_STR(STR) UART_send_str((uint8_t *)STR)
 #else
 #define PRINT_STR(STR) printf("%s", (STR))
-#endif
-
-#ifdef PLATFORM_KL25Z
-#define PRINT_ITEM_ASYNC(IT, L) UART_send_async((IT), (L))
 #endif
 
 typedef enum
@@ -83,17 +90,17 @@ typedef struct
 /*
  * @brief Logs sequence of bytes to terminal
  */
-void log_data(void * data, uint8_t len);
+void log_send_data(void * data, uint8_t len);
 
 /* 
  * @brief Logs c-style string to terminal
  */
-void log_string(char * str);
+void log_send_string(char * str);
 
 /*
  * @brief Logs integer to terminal
  */
-void log_int(int32_t i);
+void log_send_int(int32_t i);
 
 /*
  * @brief Blocks until current logger buffer is empty
@@ -101,19 +108,18 @@ void log_int(int32_t i);
 void log_flush();
 
 /*
- * @brief Adds a log item to the logger queue
+ * @brief Initialises the necessary functions for logging, minus UART
  */
-/* don't need to pass length - part of the struct */
-void log_item(log_item_t * log);
+void log_init();
 
 /*
- * @brief Asynchronously sends a log packet
+ * @brief Adds a log item to the logger queue
  */
-void log_item_async(log_item_t * log);
+void log_send_item(log_item_t * log);
 
 /*
  * @brief Creates and sends log packet
  */
-void log_pkt(log_id_t id, uint8_t source_id, uint8_t len, void * payload);
+void log_send_packet(log_id_t id, uint8_t len, void * payload);
 
-#endif /* _LOG_H_ */
+#endif /* _LOGGER_H_ */

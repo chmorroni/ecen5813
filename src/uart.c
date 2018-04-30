@@ -25,7 +25,8 @@
 #include "uart.h"
 #include "MKL25Z4.h"
 #include "circbuf.h"
-#include "log.h"
+#include "logger.h"
+#include "logger_queue.h"
 
 static CB_t * ptr_uart_tx_circ_buf = NULL;
 static CB_t * ptr_uart_rx_circ_buf = NULL;
@@ -309,16 +310,7 @@ void UART0_IRQHandler()
       if(ret == CB_SUCCESS)
       {
         /* add log packet to the UART Tx buffer */
-        uint8_t i;
-        for(i = 0; i < 7; i++)
-        {
-          CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)((uint8_t *)&log_item + i));
-        }
-        for(i = 0; i < log_item.len; i++)
-        {
-          CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)(log_item.payload + i));
-        }
-        CB_buffer_add_item(ptr_uart_tx_circ_buf, (void *)&log_item.crc);
+        CB_add_log_packet(ptr_uart_tx_circ_buf, &log_item);
       }
       else
       {

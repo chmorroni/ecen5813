@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 #include "circbuf.h"
-#include "log.h"
+#include "logger.h"
 
 #define KL25Z_PROCESSOR_FREQ_MHZ (22.29)
 #define UART_DEFAULT_OVERSAMPLING_RATIO (16)

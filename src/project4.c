@@ -25,19 +25,22 @@
 
 #include "platform.h"
 #include "circbuf.h"
-#include "uart.h"
-#include "log.h"
 #include "conversion.h"
 #include "profile.h"
+#include "logger.h"
 #include "project4.h"
+
+#ifdef PLATFORM_KL25Z
+#include "uart.h"
+#endif
 
 void project4()
 {
 #ifdef PLATFORM_KL25Z
   CB_t * ptr_rx_buf;
   UART_configure(115200, &ptr_rx_buf);
-  
-  log_pkt(LOGGER_INITIALIZED, 0, 0, NULL);
+  log_init();
+  log_send_packet(LOGGER_INITIALIZED, 0, NULL);
   
   uint8_t *src, *dst;
   uint8_t len, total_len;
@@ -64,10 +67,10 @@ void project4()
   clock_t opt_mem_lib_set_avg[PROFILE_SIZE_ARR_LEN];
 #endif /* PLATFORM_KL25Z */
   
-  log_pkt(SYSTEM_INITIALIZED, 0, 0, NULL);
-
+  log_send_packet(SYSTEM_INITIALIZED, 0, NULL);
+  
   /* Begin profiling */
-  log_pkt(PROFILING_STARTED, 0, 0, NULL);
+  log_send_packet(PROFILING_STARTED, 0, NULL);
 
   uint8_t i;
   for(i = 0; i < PROFILE_SIZE_ARR_LEN; i++) {
@@ -91,7 +94,7 @@ void project4()
     
     free(dst);
   }
-  log_pkt(PROFILING_COMPLETED, 0, 0, NULL);
+  log_send_packet(PROFILING_COMPLETED, 0, NULL);
   /* Now send profiling results */
   for (i = 0; i < PROFILE_SIZE_ARR_LEN; i++) {
     /* stdlib memmove */
@@ -105,7 +108,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* stdlib memset */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "memset bs=");
@@ -117,7 +120,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* my_memmove */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memmove bs=");
@@ -129,7 +132,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* my_memset */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memset bs=");
@@ -141,7 +144,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* my_memmove_opt */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memmove_opt bs=");
@@ -153,7 +156,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* my_memset_opt */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memset_opt bs=");
@@ -165,7 +168,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
 #ifdef PLATFORM_KL25Z
     /* memmove_dma */
     out_buf[0] = '\0'; /* reset output buffer */
@@ -178,7 +181,7 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
     /* my_memset_dma */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "memset_dma bs=");
@@ -190,10 +193,10 @@ void project4()
     total_len += len + 2;
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
-    log_pkt(PROFILING_RESULT, 0, total_len, out_buf);
+    log_send_packet(PROFILING_RESULT, total_len, out_buf);
 #endif /* PLATFORM_KL25Z */
   }
-  log_pkt(SYSTEM_HALTED, 0, 0, NULL);
+  log_send_packet(SYSTEM_HALTED, 0, NULL);
   
   while(1);
 #endif
