@@ -34,9 +34,10 @@ ARGV.each do |filename|
     #  uint8_t source_id
     source_id = log_array.shift
     log_data += source_id
-    source = "None"
-    source = "BBB" if source_id.unpack("C*").first == 0
-    source = "KL25Z" if source_id.unpack("C*").first == 1
+    source = "Unknown"
+    source = "BBB" if source_id.unpack("C*").first == 1
+    source = "KL25Z" if source_id.unpack("C*").first == 16
+    source = "HOST" if source_id.unpack("C*").first == 0
     #  uint8_t len
     log_data_len = log_array.shift
     log_data += log_data_len
