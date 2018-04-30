@@ -32,6 +32,10 @@ static CB_t * ptr_uart_tx_circ_buf = NULL;
 static CB_t * ptr_uart_rx_circ_buf = NULL;
 CB_t * ptr_log_buf = NULL;
 
+#ifdef DEBUG
+static void * ptr_to_free = NULL;
+#endif
+
 UART_e UART_configure(uint32_t baud, CB_t ** rx_buf)
 {
   /* initialize Tx buffer */
@@ -304,6 +308,12 @@ void UART0_IRQHandler()
     else if(ret == CB_EMPTY)
     {
 #ifdef DEBUG
+      if(ptr_to_free != NULL)
+      {
+        free(ptr_to_free);
+        ptr_to_free = NULL;
+      }
+
       log_item_t log_item;
       ret = CB_buffer_remove_item(ptr_log_buf, (void *)&log_item);
 
@@ -311,6 +321,7 @@ void UART0_IRQHandler()
       {
         /* add log packet to the UART Tx buffer */
         CB_add_log_packet(ptr_uart_tx_circ_buf, &log_item);
+        ptr_to_free = log_item.payload;
       }
       else
       {

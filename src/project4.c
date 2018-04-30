@@ -32,16 +32,14 @@
 
 #ifdef PLATFORM_KL25Z
 #include "uart.h"
+#include "dma.h"
 #endif
 
-void project4()
+void profile()
 {
-#ifdef PLATFORM_KL25Z
-  CB_t * ptr_rx_buf;
-  UART_configure(115200, &ptr_rx_buf);
-  log_init();
-  log_send_packet(LOGGER_INITIALIZED, 0, NULL);
-  
+  /* Begin profiling */
+  log_send_packet(PROFILING_STARTED, 0, NULL);
+
   uint8_t *src, *dst;
   uint8_t len, total_len;
   uint8_t conversion_buf[25];
@@ -66,14 +64,10 @@ void project4()
   clock_t opt_mem_lib_move_avg[PROFILE_SIZE_ARR_LEN];
   clock_t opt_mem_lib_set_avg[PROFILE_SIZE_ARR_LEN];
 #endif /* PLATFORM_KL25Z */
-  
-  log_send_packet(SYSTEM_INITIALIZED, 0, NULL);
-  
-  /* Begin profiling */
-  log_send_packet(PROFILING_STARTED, 0, NULL);
 
   uint8_t i;
-  for(i = 0; i < PROFILE_SIZE_ARR_LEN; i++) {
+  for(i = 0; i < PROFILE_SIZE_ARR_LEN; i++)
+  {
     /* overlap src and dst, so we don't need 10000+ bytes on the heap */
     dst = malloc(profile_size_arr[i] + 10);
     src = dst + 10;
@@ -94,9 +88,13 @@ void project4()
     
     free(dst);
   }
+
   log_send_packet(PROFILING_COMPLETED, 0, NULL);
+
   /* Now send profiling results */
-  for (i = 0; i < PROFILE_SIZE_ARR_LEN; i++) {
+  for (i = 0; i < PROFILE_SIZE_ARR_LEN; i++)
+  {
+
     /* stdlib memmove */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "memmove bs=");
@@ -109,6 +107,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* stdlib memset */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "memset bs=");
@@ -121,6 +120,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* my_memmove */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memmove bs=");
@@ -133,6 +133,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* my_memset */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memset bs=");
@@ -145,6 +146,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* my_memmove_opt */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memmove_opt bs=");
@@ -157,6 +159,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* my_memset_opt */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "my_memset_opt bs=");
@@ -169,6 +172,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
 #ifdef PLATFORM_KL25Z
     /* memmove_dma */
     out_buf[0] = '\0'; /* reset output buffer */
@@ -182,6 +186,7 @@ void project4()
     strcat((char*)out_buf, ": ");
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
+
     /* my_memset_dma */
     out_buf[0] = '\0'; /* reset output buffer */
     strcat((char*)out_buf, "memset_dma bs=");
@@ -195,9 +200,23 @@ void project4()
     strcat((char*)out_buf, (char*)conversion_buf);
     log_send_packet(PROFILING_RESULT, total_len, out_buf);
 #endif /* PLATFORM_KL25Z */
+
   }
-  log_send_packet(SYSTEM_HALTED, 0, NULL);
+}
+
+void project4()
+{
+#ifdef PLATFORM_KL25Z
+  CB_t * ptr_rx_buf;
+  UART_configure(115200, &ptr_rx_buf);
+  dma_init();
+#endif
+  log_init();
+  log_send_packet(LOGGER_INITIALIZED, 0, NULL);
+  log_send_packet(SYSTEM_INITIALIZED, 0, NULL);
+  profile();
   
+#ifdef PLATFORM_KL25Z
   while(1);
 #endif
 }
