@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-verbose = true
+verbose = false
 
 require 'zlib'
 
@@ -20,6 +20,10 @@ if ARGV.size == 0
 end
 
 ARGV.each do |filename|
+  if (filename === "-v" or filename === "--verbose")
+    verbose = true
+    next
+  end
   log_array = File.open(filename, "rb").read.split(//)
   until log_array.empty?
     log_data = ""
@@ -34,7 +38,7 @@ ARGV.each do |filename|
     #  uint8_t id
     log_id = log_array.shift
     log_data += log_id
-    puts "  log ID: #{log_id.unpack("C*").first} (#{log_ids[log_id.unpack("C*").first]})" if verbose
+    puts "  log ID: #{log_id.unpack("C*").first - 20} (#{log_ids[log_id.unpack("C*").first - 20]})" if verbose
     #  uint8_t source_id
     source_id = log_array.shift
     log_data += source_id
@@ -58,7 +62,7 @@ ARGV.each do |filename|
     unless crc == SimpleXorCRC(log_data)
       puts "[MALFORMED]"
     else
-      puts "#{source} - [#{timestamp} : #{log_ids[log_id.unpack("C*").first]}] #{log_payload}"
+      puts "#{source} - [#{timestamp} : #{log_ids[log_id.unpack("C*").first - 20]}] #{log_payload}"
     end
   end
 end
