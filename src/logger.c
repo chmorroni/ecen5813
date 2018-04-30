@@ -20,6 +20,8 @@
  * @date 04/27/2018
  */
 
+#include <string.h>
+#include <time.h>
 #include "conversion.h"
 #include "circbuf.h"
 #include "logger.h"
@@ -113,12 +115,18 @@ void log_send_packet(log_id_t id, uint8_t len, void * payload)
 #ifdef PLATFORM_KL25Z
   log_item.timestamp = RTC_TSR;
 #else
-  log_item.timestamp = 0;
+  log_item.timestamp = time(NULL);
 #endif /* PLATFORM_KL25Z */
   log_item.id = id;
   log_item.source_id = LOG_SOURCE_ID;
   log_item.len = len;
-  log_item.payload = payload;
+  log_item.payload = NULL;
+
+  if(len > 0)
+  {
+    log_item.payload = malloc(len);
+    memcpy(log_item.payload, payload, len);
+  }
 
   uint8_t i;
   log_item.crc = 0;
