@@ -102,7 +102,9 @@ void log_send_item(log_item_t * log)
   UART_send_log(log);
 #else
   //  PRINT_ITEM((uint8_t *)log, sizeof(log->timestamp) + sizeof(log->id) + sizeof(log->source_id) + sizeof(log->len));
-  PRINT_ITEM((uint8_t *)log, 7);
+  uint8_t i;
+  for (i = 0; i < 7; i++) { printf("%c", *((uint8_t*)log) + i); }
+  //  PRINT_ITEM((uint8_t *)log, 7);
   PRINT_ITEM(log->payload, log->len);
   PRINT_ITEM(&log->crc, sizeof(log->crc));
 #endif /* PLATFORM_KL25Z */
